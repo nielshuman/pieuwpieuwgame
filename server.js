@@ -2,8 +2,10 @@ const player_size = 32;
 const world_radius = 2000;
 const world_size = world_radius * 2
 const bullet_length = 30;
+const bullet_speed = 10;
 
 const rand = (lo, hi) => lo + (hi - lo) * Math.random();
+const constrain = (n, lo, hi) => Math.max(Math.min(n, hi), lo);
 const randarray = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const randpos = function() {
   let x = rand(-world_radius, world_radius);
@@ -44,17 +46,15 @@ class Bullet extends Rect {
     } else if (vy != 0) {
       super(x, y, 10, bullet_length)
     }
-    this.vx = vx;
-    this.vy = vy;
+    this.vx = constrain(vx, -1, 1) * bullet_speed;
+    this.vy = constrain(vy, -1, 1) * bullet_speed;
     this.author = author;
     this.color = '#e22';
   }
   update() {
     this.x += this.vx;
     this.y += this.vy;
-    for (let wall of world.walls) {
-      if (this.hit(wall)) world.bullets.splice(world.bullets.indexOf(this), 1);
-    }
+    for (let wall of world.walls) {if (this.hit(wall)) world.bullets.splice(world.bullets.indexOf(this), 1);} // remove bullet if hit wall
   }
 }
 
@@ -63,6 +63,7 @@ class World {
     this.players = [];
     this.bullets = [];
     this.walls = [];
+
     // outside walls
     this.walls.push(
       new Rect(-world_radius-10, -world_radius, 10, world_size+20),
@@ -91,7 +92,7 @@ class World {
     // spawn niet in muren
     while (hit) {
       hit = false;
-      pos = randpos()
+      pos = randpos();
       for (let wall of world.walls) {
         if (wall.hit(pos)) hit = true;
       }
@@ -105,6 +106,7 @@ class World {
         this.players.splice(i);
       }
     }
+    // filter() ?
   }
   
   updatePlayer(id, p) {
@@ -127,11 +129,16 @@ class World {
 
 // command line arguments
 var argv = require('yargs')
-    .default('p', 3000)
-    .alias('p', 'port')
-    .default('i', 33) // 30 Hz
-    .alias('i', 'interval')
-    .describe('i', 'Interval in miliseconds of sending data')
+    .option('port', {
+      alias: 'p',
+      default: 3000,
+      describe: 'port to bind on'
+    })
+    .option('interval', {
+      alias: 'i',
+      default: 33, // 30 Hz
+      describe: 'Interval in miliseconds of sending data'
+    })
     .help('h')
     .alias('h', 'help')
     .argv

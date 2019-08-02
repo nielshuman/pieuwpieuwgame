@@ -31,7 +31,7 @@ function start(p, w) {
 
 function update(w) {
   world.players = w.players;
-  world.walls = []
+  world.walls = [];
   world.bullets = w.bullets;
   for (let wall of w.walls) {
     world.walls.push(new Rect(wall.x, wall.y, wall.w, wall.h, wall.color))
