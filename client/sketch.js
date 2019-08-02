@@ -1,5 +1,5 @@
 let walls = [], player, ready
-let W, H, W2, H2;
+let W, H, W2, H2, fps = 0;
 
 function preload() {
   soundFormats('wav');
@@ -29,14 +29,10 @@ function start(p, w) {
   ready = true;
 }
 
-function update(w) {
-  world.players = w.players;
-  world.walls = [];
-  world.bullets = w.bullets;
-  for (let wall of w.walls) {
-    world.walls.push(new Rect(wall.x, wall.y, wall.w, wall.h, wall.color))
-  }
-  socket.emit('update', player) // update back, in speed of server
+function update(players, bullets) {
+  world.players = players;
+  world.bullets = bullets;
+  socket.emit('update', player)
 }
 
 function draw() {
@@ -59,6 +55,12 @@ function draw() {
   player.show();
   world.showPlayers();
   pop();
+
+  // Draw FPS (rounded to 2 decimal places) at the bottom left of the screen
+  if (frameCount % 50 == 0) fps = frameRate();
+  fill(255);
+  stroke(0);
+  text("FPS: " + fps.toFixed(2), 10, height - 10);
 }
 
 function keyPressed() {

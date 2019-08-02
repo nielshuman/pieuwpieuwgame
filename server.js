@@ -2,7 +2,7 @@ const player_size = 32;
 const world_radius = 2000;
 const world_size = world_radius * 2
 const bullet_length = 30;
-const bullet_speed = 10;
+const bullet_speed = 50;
 
 const rand = (lo, hi) => lo + (hi - lo) * Math.random();
 const constrain = (n, lo, hi) => Math.max(Math.min(n, hi), lo);
@@ -102,9 +102,7 @@ class World {
 
   removePlayer(id) {
     for (var i = this.players.length - 1; i >= 0; i--) {
-      if (this.players[i].id === id) {
-        this.players.splice(i);
-      }
+      if (this.players[i].id === id) this.players.splice(i);
     }
     // filter() ?
   }
@@ -120,9 +118,7 @@ class World {
 
   findPlayerById(id) {
     for (let player of this.players) {
-      if (player.id == id) {
-        return player;
-      } 
+      if (player.id == id) return player;
     }
   }
 }
@@ -139,8 +135,7 @@ var argv = require('yargs')
       default: 33, // 30 Hz
       describe: 'Interval in miliseconds of sending data'
     })
-    .help('h')
-    .alias('h', 'help')
+    .help()
     .argv
 ;
 
@@ -190,7 +185,7 @@ io.sockets.on('connection', socket => {
 // kind of main loop thing
 function update() {
   for (let player of world.players) { // only 'ready clients' update
-    io.to(player.id).emit('update', world);
+    io.to(player.id).emit('update', world.players, world.bullets);
   }
   for (let bullet of world.bullets) {
     bullet.update();
@@ -198,7 +193,6 @@ function update() {
   // for (let wall of world.walls) {  
   // world.bullets = world.bullets.filter((value, index, arr) => !value.hits(wall))
   // }
-
 }
 
 setInterval(update, argv.i);
