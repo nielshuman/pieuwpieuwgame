@@ -1,0 +1,17 @@
+{
+  "name": "websockets_p5_start",
+  "version": "1.0.0",
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.17.1",
+    "socket.io": "^1.7.4",
+    "yargs": "^13.2.4"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "description": "Simple begin of multiplayer game",
+  "devDependencies": {},
+  "author": "Niels Huisman",
+  "license": "ISC"
+}
