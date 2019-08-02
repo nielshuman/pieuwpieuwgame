@@ -1,4 +1,4 @@
-class HealthBar() {
+class Bar {
   constructor(x, y, w, h) {
     this.x = x;
     this.y = y;
@@ -10,11 +10,11 @@ class HealthBar() {
   }
 
   updateval(newval) {
-    this.val = newval;
+    this.val = constrain(newval, 0, 100);
   }
 
   show() {
-    nosStroke();
+    noStroke();
     fill(this.col2);
     rect(this.x, this.y, this.w, this.h); // background bar
     fill(this.col1);

@@ -27,6 +27,7 @@ function start(p, w) {
   player = new SolidRect(p.x, p.y, p.w, p.h, world.walls);
   player.color = p.color;
   ready = true;
+  hbar = new HealthBar(width -220, height - 50, 200, 30)
 }
 
 function update(players, bullets) {
@@ -56,6 +57,8 @@ function draw() {
   world.showPlayers();
   pop();
 
+  hbar.updateval(frameCount / 10);
+  hbar.show();
   // Draw FPS (rounded to 2 decimal places) at the bottom left of the screen
   if (frameCount % 50 == 0) fps = frameRate();
   fill(255);
