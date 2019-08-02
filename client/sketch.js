@@ -1,6 +1,5 @@
 let walls = [], player, ready
 let W, H, W2, H2;
-const bullet_speed = 10;
 
 function preload() {
   soundFormats('wav');
@@ -37,6 +36,7 @@ function update(w) {
   for (let wall of w.walls) {
     world.walls.push(new Rect(wall.x, wall.y, wall.w, wall.h, wall.color))
   }
+  socket.emit('update', player) // update back, in speed of server
 }
 
 function draw() {
@@ -59,9 +59,6 @@ function draw() {
   player.show();
   world.showPlayers();
   pop();
-
-  // updating to sever
-  socket.emit('update', player)
 }
 
 function keyPressed() {
@@ -85,22 +82,22 @@ function keyPressed() {
         case 'up':
           x = player.x + (player.w / 2) -5;
           y = player.y;
-          vy = - bullet_speed;
+          vy = - 1;
           break;
         case 'down':
           x = player.x + (player.w / 2) -5;
           y = (player.y + player.h) - 10;
-          vy = bullet_speed;
+          vy = 1;
           break;
         case 'left':
           x = player.x;
           y = player.y + (player.h / 2) -5;
-          vx = -bullet_speed;
+          vx = -1;
           break;
         case 'right':
           x = (player.x + player.w) - 10;
           y = player.y + (player.h / 2) -5;
-          vx = bullet_speed;
+          vx = 1;
           break;
     }
     socket.emit('bullet', x, y, vx, vy);
