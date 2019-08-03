@@ -1,8 +1,13 @@
 class World {
-  constructor() {
+  constructor(w) {
     this.players = [];
     this.walls = [];
+    for (let wall of w.walls) {
+      this.walls.push(Rect.from_obj(wall));
+    }
     this.bullets = [];
+    this.server_start_time = w.start_time;
+    this.start_time = Date.now();
   }
 
   showPlayers() {
@@ -12,7 +17,7 @@ class World {
           noStroke();
           fill(str(player.color));
           rect(player.x, player.y, player.w, player.h, 10);
-          } 
+          }
       }
 
   }

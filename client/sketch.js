@@ -1,5 +1,6 @@
-let walls = [], player, ready
+let walls = [], player, ready, world, socket;
 let W, H, W2, H2, fps = 0;
+
 
 function preload() {
   soundFormats('wav');
@@ -9,31 +10,32 @@ function preload() {
 }
 
 function setup() {
+  frameRate(10);
   createCanvas(windowWidth, windowHeight);
   W = width; H = height; W2 = W / 2; H2 = H / 2;
-  world = new World();
   socket = io();
-  socket.on('update', update);
-  socket.on('start', start);
-  socket.emit('ready');
+  socket.on('server_update', on_server_update);
+  socket.on('server_welcome', on_server_welcome);
+  socket.emit('player_join');
 }
 
-function start(p, w) {
+function on_server_welcome(p, w) {
   // start signal from server
-  world.walls = []
-  for (let wall of w.walls) {
-    world.walls.push(new Rect(wall.x, wall.y, wall.w, wall.h, wall.color))
-  }
-  player = new SolidRect(p.x, p.y, p.w, p.h, world.walls);
+  w.start_time + p.join_time
+
+  world = new World(w);
+
+  player = SolidRect.from_obj(p);
+  player.hit_list = world.walls;
   player.color = p.color;
   ready = true;
-  hbar = new HealthBar(width -220, height - 50, 200, 30)
+  hbar = new Bar(width -220, height - 50, 200, 30)
 }
 
-function update(players, bullets) {
+function on_server_update(players, bullets) {
   world.players = players;
   world.bullets = bullets;
-  socket.emit('update', player)
+  socket.emit('player_update', player)
 }
 
 function draw() {
@@ -49,7 +51,7 @@ function draw() {
   // rendering world
   push();
   translate(W2 - player.x - player.w / 2, H2 - player.y - player.h / 2);
-  for (let wall of world.walls) wall.show();  
+  for (let wall of world.walls) wall.show();
 
   // rendering players
   world.showBullets();
@@ -67,10 +69,10 @@ function draw() {
 }
 
 function keyPressed() {
-  if (key == 'r') { 
-    socket.emit('reset')
+  if (key == 'r') {
+    socket.emit('player_reset')
     console.log("---------RESET--------");
-  } else if (key == 'q') { 
+  } else if (key == 'q') {
     console.log("---------EXIT--------");
     noLoop();
   } else if (key == 'm') {

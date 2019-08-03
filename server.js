@@ -2,7 +2,7 @@ const player_size = 32;
 const world_radius = 2000;
 const world_size = world_radius * 2
 const bullet_length = 30;
-const bullet_speed = 50;
+const bullet_speed = 10;
 
 const rand = (lo, hi) => lo + (hi - lo) * Math.random();
 const constrain = (n, lo, hi) => Math.max(Math.min(n, hi), lo);
@@ -36,6 +36,7 @@ class Player extends Rect {
   constructor(id, x, y) {
     super(x, y, player_size, player_size, '#d60');
     this.id = id;
+    this.join_time = world.now();
   }
 }
 
@@ -54,7 +55,9 @@ class Bullet extends Rect {
   update() {
     this.x += this.vx;
     this.y += this.vy;
-    for (let wall of world.walls) {if (this.hit(wall)) world.bullets.splice(world.bullets.indexOf(this), 1);} // remove bullet if hit wall
+    for (let wall of world.walls) {
+      if (this.hit(wall)) world.bullets.splice(world.bullets.indexOf(this), 1);
+    } // remove bullet if hit wall
   }
 }
 
@@ -63,6 +66,7 @@ class World {
     this.players = [];
     this.bullets = [];
     this.walls = [];
+    this.start_time = Date.now();
 
     // outside walls
     this.walls.push(
@@ -71,22 +75,23 @@ class World {
       new Rect(-world_radius, -world_radius-10, world_size+20, 10),
       new Rect(-world_radius, world_radius+10, world_size+20, 10)
     )
-    
+
     // random level walls
     const g = 125, s = 25;
-    for (let x = -g * 3; x < world_size + g * 3; x += g) {
-      for (let y =  -g * 3; y < world_size + g * 3; y += g) {
-        if (Math.random() < 0.3) continue;
+    for (let x = -world_radius; x < world_radius; x += g) {
+      for (let y =  -world_radius; y < world_radius; y += g) {
+        if (Math.random() < 0.5) continue;
         let w = randarray([s, g + s]);
         let h = randarray([s, g + s]);
-        if (w == s && h == s) continue;
         let wall = new Rect(x, y, w, h);
         wall.color = `hsl(${floor(rand(240, 300))}, 10%, ${rand(5, 15)}%)`;
         this.walls.push(wall);
       }
     }
   }
-  
+
+  now() { return Date.now() - this.start_time; }
+
   newPlayer(socket) {
     let pos, hit = true;
     // spawn niet in muren
@@ -97,7 +102,9 @@ class World {
         if (wall.hit(pos)) hit = true;
       }
     }
-    this.players.push(new Player(socket.id, pos.x, pos.y));
+    let new_player = new Player(socket.id, pos.x, pos.y);
+    this.players.push(new_player);
+    return new_player;
   }
 
   removePlayer(id) {
@@ -106,7 +113,7 @@ class World {
     }
     // filter() ?
   }
-  
+
   updatePlayer(id, p) {
     for (var i = this.players.length - 1; i >= 0; i--) {
       if (this.players[i].id == id) {
@@ -132,7 +139,7 @@ var argv = require('yargs')
     })
     .option('interval', {
       alias: 'i',
-      default: 33, // 30 Hz
+      default: 100, // 10 Hz
       describe: 'Interval in miliseconds of sending data'
     })
     .help()
@@ -146,7 +153,8 @@ const listening = function() {console.log('Server listening at port ' + server.a
 let server = app.listen(argv.p, listening); // listen() if server started
 app.use(express.static('client'));
 
-//sockets thing
+
+// ========= BEGIN =========================================================
 
 let world = new World();
 
@@ -155,13 +163,15 @@ let io = require('socket.io')(server); // socket.io uses http server
 io.sockets.on('connection', socket => {
     let id = socket.id.substring(16, 20) // last 4 charaters are less nonsense
     console.log('New client connected with id ' + id);
-    socket.on('ready', () => {
-        console.log('Player ' + id + ' is ready');
-        world.newPlayer(socket);
-        socket.emit('start', world.findPlayerById(socket.id), world);
+
+    socket.on('player_join', () => {
+        console.log('Player ' + id + ' joined');
+        let new_player = world.newPlayer(socket);
+        socket.emit('server_welcome', new_player, world);
     });
 
-    socket.on('update', (p) => {
+    socket.on('player_update', (p) => {
+      // TODO: sanity check p
       world.updatePlayer(socket.id, p);
     });
 
@@ -170,7 +180,7 @@ io.sockets.on('connection', socket => {
       console.log(id + ' left');
     });
 
-    socket.on('reset', () => {
+    socket.on('player_reset', () => {
       console.log('Resetting ' + id)
       world.removePlayer(socket.id);
       world.newPlayer(socket);
@@ -183,16 +193,18 @@ io.sockets.on('connection', socket => {
 })
 
 // kind of main loop thing
-function update() {
+function heartbeat() {
   for (let player of world.players) { // only 'ready clients' update
-    io.to(player.id).emit('update', world.players, world.bullets);
+    io.to(player.id).emit('server_update', world.players, world.bullets);
   }
   for (let bullet of world.bullets) {
     bullet.update();
   }
-  // for (let wall of world.walls) {  
+  // for (let wall of world.walls) {
   // world.bullets = world.bullets.filter((value, index, arr) => !value.hits(wall))
   // }
+  updateCount++;
 }
 
-setInterval(update, argv.i);
+let updateCount = 0;
+setInterval(heartbeat, argv.i);

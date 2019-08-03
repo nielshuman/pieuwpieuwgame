@@ -7,6 +7,9 @@ class Rect {
     this.color = c;
     this.dir = 'right'
   }
+  static from_obj(o) {
+    return new this(o.x, o.y, o.w, o.h, o.color);
+  }
   show() {
     noStroke();
     fill(this.color);
@@ -21,9 +24,11 @@ class Rect {
 }
 
 class SolidRect extends Rect {
-  constructor(x, y, w, h, hit_list) {
-    super(x, y, w, h);
+  constructor(x, y, w, h, c, hit_list) {
+    super(x, y, w, h, c);
     this.hit_list = hit_list;
+    this.dx = 0;
+    this.dy = 0;
   }
   move(dx, dy) {
     const px = this.x, py = this.y;
@@ -37,35 +42,37 @@ class SolidRect extends Rect {
         let t, x;
         t = (qy - py2) / dy; // top edge
         x = px + t * dx;
-        if (t >= 0 && t < min_t && x < qx2 && qx < x + this.w) { 
-          min_t = t; 
-          result = "top"; 
+        if (t >= 0 && t < min_t && x < qx2 && qx < x + this.w) {
+          min_t = t;
+          result = "top";
         }
         t = (qy2 - py) / dy; // bottom edge
         x = px + t * dx;
-        if (t >= 0 && t < min_t && x < qx2 && qx < x + this.w) { 
-          min_t = t; 
-          result = "bottom"; 
+        if (t >= 0 && t < min_t && x < qx2 && qx < x + this.w) {
+          min_t = t;
+          result = "bottom";
         }
       }
       if (dx != 0) {
         let t, y;
         t = (qx - px2) / dx; // left edge
         y = py + t * dy;
-        if (t >= 0 && t < min_t && y < qy2 && qy < y + this.h) { 
-          min_t = t; 
-          result = "left"; 
+        if (t >= 0 && t < min_t && y < qy2 && qy < y + this.h) {
+          min_t = t;
+          result = "left";
         }
         t = (qx2 - px) / dx; // right edge
         y = py + t * dy;
-        if (t >= 0 && t < min_t && y < qy2 && qy < y + this.h) { 
-          min_t = t; 
-          result = "right"; 
+        if (t >= 0 && t < min_t && y < qy2 && qy < y + this.h) {
+          min_t = t;
+          result = "right";
         }
       }
     }
     this.x = px + min_t * dx;
     this.y = py + min_t * dy;
+    this.dx = dx;
+    this.dy = dy;
     return [result, min_t]
   }
   show() {
@@ -73,5 +80,5 @@ class SolidRect extends Rect {
     noStroke();
     fill(this.color);
     rect(this.x - wob, this.y + wob, this.w + 2 * wob, this.h - 2 * wob, 8, 8);
-  }  
+  }
 }
