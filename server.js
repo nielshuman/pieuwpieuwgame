@@ -1,5 +1,5 @@
 const player_size = 32;
-const world_radius = 2000;
+const world_radius = 1000;
 const world_size = world_radius * 2
 const bullet_length = 30;
 const bullet_speed = 10;
@@ -36,25 +36,32 @@ class Player extends Rect {
   constructor(id, x, y) {
     super(x, y, player_size, player_size, '#d60');
     this.id = id;
+    this.energy = 100;
     this.join_time = world.now();
   }
 }
 
 class Bullet extends Rect {
-  constructor (x, y, vx, vy, author='None') {
+  constructor (x, y, vx, vy, author='None', spawn_time) {
     if (vx != 0) {
-      super(x, y, bullet_length, 10)
+      super(x, y, bullet_length, 10);
+      this.vx = bullet_speed * Math.sign(vx);
+      this.vy = 0;
     } else if (vy != 0) {
-      super(x, y, 10, bullet_length)
+      super(x, y, 10, bullet_length);
+      this.vx = 0;
+      this.vy = bullet_speed * Math.sign(vy);
     }
-    this.vx = constrain(vx, -1, 1) * bullet_speed;
-    this.vy = constrain(vy, -1, 1) * bullet_speed;
+    this.x0 = x;
+    this.y0 = y;
     this.author = author;
     this.color = '#e22';
+    this.spawn_time = spawn_time;
   }
   update() {
-    this.x += this.vx;
-    this.y += this.vy;
+    const age = world.now() - this.spawn_time;
+    this.x = this.x0 + this.vx * age;
+    this.y = this.y0 + this.vy * age;
     for (let wall of world.walls) {
       if (this.hit(wall)) world.bullets.splice(world.bullets.indexOf(this), 1);
     } // remove bullet if hit wall
@@ -70,10 +77,10 @@ class World {
 
     // outside walls
     this.walls.push(
-      new Rect(-world_radius-10, -world_radius, 10, world_size+20),
-      new Rect(world_radius+10, -world_radius, 10, world_size+20),
-      new Rect(-world_radius, -world_radius-10, world_size+20, 10),
-      new Rect(-world_radius, world_radius+10, world_size+20, 10)
+      new Rect(-world_radius - 10, -world_radius - 10, 10, world_size + 30),
+      new Rect( world_radius + 10, -world_radius - 10, 10, world_size + 30),
+      new Rect(-world_radius - 10, -world_radius - 10, world_size + 20, 10),
+      new Rect(-world_radius, world_radius + 10, world_size + 20, 10)
     )
 
     // random level walls
@@ -109,18 +116,15 @@ class World {
 
   removePlayer(id) {
     for (var i = this.players.length - 1; i >= 0; i--) {
-      if (this.players[i].id === id) this.players.splice(i);
+      if (this.players[i].id === id) this.players.splice(i, 1);
     }
-    // filter() ?
   }
 
-  updatePlayer(id, p) {
-    for (var i = this.players.length - 1; i >= 0; i--) {
-      if (this.players[i].id == id) {
-        this.players[i].x = p.x;
-        this.players[i].y = p.y;
-      }
-    }
+  updatePlayer(id, p_new) {
+    let p = this.findPlayerById(id);
+    p.x = p_new.x;
+    p.y = p_new.y;
+    p.energy = p_new.energy;
   }
 
   findPlayerById(id) {
@@ -167,6 +171,7 @@ io.sockets.on('connection', socket => {
     socket.on('player_join', () => {
         console.log('Player ' + id + ' joined');
         let new_player = world.newPlayer(socket);
+        world.age = world.now();
         socket.emit('server_welcome', new_player, world);
     });
 
@@ -187,7 +192,7 @@ io.sockets.on('connection', socket => {
       socket.emit('start', world.findPlayerById(socket.id), world);
     })
 
-    socket.on('bullet', (x, y, vx, vy) => {
+    socket.on('bullet', (spawn_time, x, y, vx, vy) => {
       world.bullets.push(new Bullet(x, y, vx, vy, socket.id))
     })
 })

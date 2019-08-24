@@ -8,7 +8,7 @@ class Rect {
     this.dir = 'right'
   }
   static from_obj(o) {
-    return new this(o.x, o.y, o.w, o.h, o.color);
+    return new Rect(o.x, o.y, o.w, o.h, o.color);
   }
   show() {
     noStroke();
@@ -75,10 +75,53 @@ class SolidRect extends Rect {
     this.dy = dy;
     return [result, min_t]
   }
+}
+
+class Player extends SolidRect {
+  constructor(x, y, w, h, c, e, id, hit_list) {
+    super(x, y, w, h, c, hit_list);
+    this.energy = e;
+    this.id = id;
+  }
+  static from_obj(o) {
+    return new Player(o.x, o.y, o.w, o.h, o.color, o.energy, o.id);
+  }
+
   show() {
     let wob = sin(Date.now() * 0.01) * 2;
     noStroke();
     fill(this.color);
     rect(this.x - wob, this.y + wob, this.w + 2 * wob, this.h - 2 * wob, 8, 8);
+    noFill(); strokeWeight(3.0);
+    let c = "#0f08";
+    if (this.energy < 67) c = "#ff08";
+    if (this.energy < 25) c = "#f008";
+    stroke(c);
+    const r = this.energy * TAU / 100;
+    if (r > 0) arc(this.x + this.w / 2, this.y + this.h / 2, this.w * 2, this.h * 2, 1.5 * PI, 1.5 * PI + r);
+  }
+}
+
+class Bullet extends Rect {
+  constructor (x, y, vx, vy) {
+    if (vx != 0) {
+      super(x, y, 30, 10)
+    } else if (vy != 0) {
+      super(x, y, 10, 30)
+    }
+    this.vx = vx;
+    this.vy = vy;
+  }
+  static from_obj(o) {
+    const b = new Bullet(o.x, o.y, o.vx, o.vy);
+    b.author = o.author;
+    b.x0 = o.x0;
+    b.y0 = o.y0;
+    b.spawn_time = o.spawn_time;
+  }
+  update() {
+    // update slimmer
+    this.x += this.vy;
+    this.y += this.vy;
   }
 }
