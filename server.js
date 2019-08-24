@@ -193,7 +193,7 @@ io.sockets.on('connection', socket => {
     })
 
     socket.on('bullet', (spawn_time, x, y, vx, vy) => {
-      world.bullets.push(new Bullet(x, y, vx, vy, socket.id))
+      world.bullets.push(new Bullet(x, y, vx, vy, socket.id, spawn_time))
     })
 })
 

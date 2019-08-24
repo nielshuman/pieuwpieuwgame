@@ -120,8 +120,8 @@ class Bullet extends Rect {
     b.spawn_time = o.spawn_time;
   }
   update() {
-    // update slimmer
-    this.x += this.vy;
-    this.y += this.vy;
+    const age = world.now() - this.spawn_time;
+    this.x = this.x0 + this.vx * age;
+    this.y = this.y0 + this.vy * age;
   }
 }

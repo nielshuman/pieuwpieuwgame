@@ -1,4 +1,4 @@
-p5.disableFriendlyErrors = true; // disables FES
+// p5.disableFriendlyErrors = true; // disables FES
 
 let walls = [], player, ready, world, socket;
 let W, H, W2, H2, fps = 0;
@@ -56,9 +56,15 @@ function draw() {
   // rendering world
   push();
   translate(W2 - player.x - player.w / 2, H2 - player.y - player.h / 2);
-  for (let wall of world.walls) wall.show();
-  world.showBullets();
-  for (let p of world.players) (p.id == player.id ? player : p).show();
+  for (let wall of world.walls) {
+    wall.show();
+  }
+  for (let bb of world.bullets) {
+    bb.show();
+  }
+  for (let p of world.players) {
+    (p.id == player.id ? player : p).show();
+  }
   pop();
 
   hbar.updateval(frameCount / 10);
