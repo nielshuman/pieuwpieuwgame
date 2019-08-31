@@ -103,25 +103,33 @@ class Player extends SolidRect {
 }
 
 class Bullet extends Rect {
-  constructor (x, y, vx, vy) {
+  constructor (x, y, vx, vy, author) {
     if (vx != 0) {
       super(x, y, 30, 10)
     } else if (vy != 0) {
       super(x, y, 10, 30)
     }
+    this.author = author;
+    this.color = '#e22';
     this.vx = vx;
     this.vy = vy;
   }
   static from_obj(o) {
-    const b = new Bullet(o.x, o.y, o.vx, o.vy);
-    b.author = o.author;
+    const b = new Bullet(o.x, o.y, o.vx, o.vy, o.author);
     b.x0 = o.x0;
     b.y0 = o.y0;
     b.spawn_time = o.spawn_time;
+    b.color = o.color;
+    return b;
   }
   update() {
     const age = world.now() - this.spawn_time;
     this.x = this.x0 + this.vx * age;
     this.y = this.y0 + this.vy * age;
+  }
+  show() {
+    noStroke();
+    fill(this.color);
+    rect(this.x, this.y, this.w, this.h, 5, 5);
   }
 }

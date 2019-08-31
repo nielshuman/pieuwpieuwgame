@@ -1,8 +1,8 @@
 const player_size = 32;
 const world_radius = 1000;
 const world_size = world_radius * 2
-const bullet_length = 30;
-const bullet_speed = 10;
+const bullet_length = 60;
+const bullet_speed = 1, bullet_max_age = world_size / bullet_speed;
 
 const rand = (lo, hi) => lo + (hi - lo) * Math.random();
 const constrain = (n, lo, hi) => Math.max(Math.min(n, hi), lo);
@@ -44,7 +44,7 @@ class Player extends Rect {
 class Bullet extends Rect {
   constructor (x, y, vx, vy, author='None', spawn_time) {
     if (vx != 0) {
-      super(x, y, bullet_length, 10);
+      super(x, y, bullet_length, 10); ///aaaaa
       this.vx = bullet_speed * Math.sign(vx);
       this.vy = 0;
     } else if (vy != 0) {
@@ -60,11 +60,15 @@ class Bullet extends Rect {
   }
   update() {
     const age = world.now() - this.spawn_time;
+    if (age > bullet_max_age) this.remove();
     this.x = this.x0 + this.vx * age;
     this.y = this.y0 + this.vy * age;
     for (let wall of world.walls) {
-      if (this.hit(wall)) world.bullets.splice(world.bullets.indexOf(this), 1);
+      if (this.hit(wall)) this.remove()
     } // remove bullet if hit wall
+  }
+  remove() {
+    world.bullets.splice(world.bullets.indexOf(this), 1);
   }
 }
 
@@ -199,11 +203,11 @@ io.sockets.on('connection', socket => {
 
 // kind of main loop thing
 function heartbeat() {
-  for (let player of world.players) { // only 'ready clients' update
-    io.to(player.id).emit('server_update', world.players, world.bullets);
-  }
   for (let bullet of world.bullets) {
     bullet.update();
+  }
+  for (let player of world.players) { // only 'ready clients' update
+    io.to(player.id).emit('server_update', world.players, world.bullets);
   }
   // for (let wall of world.walls) {
   // world.bullets = world.bullets.filter((value, index, arr) => !value.hits(wall))

@@ -60,6 +60,7 @@ function draw() {
     wall.show();
   }
   for (let bb of world.bullets) {
+    bb.update();
     bb.show();
   }
   for (let p of world.players) {
@@ -70,10 +71,11 @@ function draw() {
   hbar.updateval(frameCount / 10);
   hbar.show();
   // Draw FPS (rounded to 2 decimal places) at the bottom left of the screen
-  if (frameCount % 50 == 0) fps = frameRate();
+  if (frameCount % 20 == 0) fps = frameRate();
   fill(255);
   stroke(0);
-  text("FPS: " + fps.toFixed(2), 10, height - 10);
+  text(`FPS: ${fps.toFixed(2)}`, 10, height - 10);
+  text(`NOW: ${world.now()}`, 10, height - 30);
 }
 
 function keyPressed() {
@@ -82,7 +84,7 @@ function keyPressed() {
     console.log("---------RESET--------");
   } else if (key == 'q') {
     console.log("---------EXIT--------");
-    noLoop();
+    console.log(world.bullets)
   } else if (key == 'm') {
     if (getMasterVolume() == 0) {
       masterVolume(1);
