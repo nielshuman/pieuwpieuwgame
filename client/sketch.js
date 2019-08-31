@@ -30,13 +30,13 @@ function on_server_welcome(p, w) {
   player.hit_list = world.walls;
   player.color = p.color;
   ready = true;
-  hbar = new Bar(width -220, height - 50, 200, 30)
+  // hbar = new Bar(width -220, height - 50, 200, 30);
 }
 
 function on_server_update(players, bullets) {
   world.players = players.map(Player.from_obj);
   world.bullets = bullets.map(Bullet.from_obj);
-  socket.emit('player_update', player)
+  socket.emit('player_update', player);
 }
 
 function draw() {
@@ -59,18 +59,17 @@ function draw() {
   for (let wall of world.walls) {
     wall.show();
   }
+  for (let p of world.players) {
+    (p.id == player.id ? player : p).show();
+  }
   for (let bb of world.bullets) {
     bb.update();
     bb.show();
   }
-  for (let p of world.players) {
-    (p.id == player.id ? player : p).show();
-  }
   pop();
 
-  hbar.updateval(frameCount / 10);
-  hbar.show();
-  // Draw FPS (rounded to 2 decimal places) at the bottom left of the screen
+  // hbar.updateval(frameCount / 10);
+  // hbar.show();
   if (frameCount % 20 == 0) fps = frameRate();
   fill(255);
   stroke(0);
@@ -80,18 +79,19 @@ function draw() {
 
 function keyPressed() {
   if (key == 'r') {
-    socket.emit('player_reset')
+    socket.emit('player_reset'); // TODO: fixen of weghalen
     console.log("---------RESET--------");
   } else if (key == 'q') {
     console.log("---------EXIT--------");
-    console.log(world.bullets)
+    socket.disconnect();
+    noLoop();
   } else if (key == 'm') {
     if (getMasterVolume() == 0) {
       masterVolume(1);
       console.log('Unmuted');
     } else {
       masterVolume(0);
-      console.log('Muted')
+      console.log('Muted');
     }
   } else if (key == ' ') {
     let vx = 0, vy = 0, x, y;

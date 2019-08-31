@@ -10,6 +10,6 @@ class World {
     this.start_time = Date.now();
   }
 
-  now() { return this.age + Date.now() - this.start_time; }
+  now() {return this.age + Date.now() - this.start_time;}
 
 }

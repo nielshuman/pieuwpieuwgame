@@ -4,16 +4,16 @@ const world_size = world_radius * 2
 const bullet_length = 60;
 const bullet_speed = 1, bullet_max_age = world_size / bullet_speed;
 
+
 const rand = (lo, hi) => lo + (hi - lo) * Math.random();
 const constrain = (n, lo, hi) => Math.max(Math.min(n, hi), lo);
 const randarray = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const floor = Math.floor;
 const randpos = function() {
   let x = rand(-world_radius, world_radius);
   let y = rand(-world_radius, world_radius);
   return new Rect(x, y, player_size, player_size)
 }
-
-const floor = Math.floor;
 
 class Rect {
   constructor(x, y, w, h, c='#000') {
@@ -151,12 +151,11 @@ var argv = require('yargs')
       describe: 'Interval in miliseconds of sending data'
     })
     .help()
-    .argv
-;
+    .argv;
 
 // Http server
 let express = require('express');
-let app = express()
+let app = express();
 const listening = function() {console.log('Server listening at port ' + server.address().port);};
 let server = app.listen(argv.p, listening); // listen() if server started
 app.use(express.static('client'));
@@ -170,10 +169,10 @@ let io = require('socket.io')(server); // socket.io uses http server
 
 io.sockets.on('connection', socket => {
     let id = socket.id.substring(16, 20) // last 4 charaters are less nonsense
-    console.log('New client connected with id ' + id);
+    console.log('New client: ' + id);
 
     socket.on('player_join', () => {
-        console.log('Player ' + id + ' joined');
+        console.log(id + ' joined the game');
         let new_player = world.newPlayer(socket);
         world.age = world.now();
         socket.emit('server_welcome', new_player, world);
@@ -186,7 +185,7 @@ io.sockets.on('connection', socket => {
 
     socket.on('disconnect', () => {
       world.removePlayer(socket.id); // remove zombie players
-      console.log(id + ' left');
+      console.log(id + ' disconnected');
     });
 
     socket.on('player_reset', () => {

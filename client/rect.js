@@ -105,9 +105,9 @@ class Player extends SolidRect {
 class Bullet extends Rect {
   constructor (x, y, vx, vy, author) {
     if (vx != 0) {
-      super(x, y, 30, 10)
+      super(x, y, 30, 10);
     } else if (vy != 0) {
-      super(x, y, 10, 30)
+      super(x, y, 10, 30);
     }
     this.author = author;
     this.color = '#e22';
