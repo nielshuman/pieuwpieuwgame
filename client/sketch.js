@@ -30,13 +30,13 @@ function on_server_welcome(p, w) {
   player.hit_list = world.walls;
   player.color = p.color;
   ready = true;
-  hbar = new Bar(width -220, height - 50, 200, 30)
+  // hbar = new Bar(width -220, height - 50, 200, 30);
 }
 
 function on_server_update(players, bullets) {
   world.players = players.map(Player.from_obj);
   world.bullets = bullets.map(Bullet.from_obj);
-  socket.emit('player_update', player)
+  socket.emit('player_update', player);
 }
 
 function draw() {
@@ -68,8 +68,8 @@ function draw() {
   }
   pop();
 
-  hbar.updateval(frameCount / 10);
-  hbar.show();
+  // hbar.updateval(frameCount / 10);
+  // hbar.show();
   // Draw FPS (rounded to 2 decimal places) at the bottom left of the screen
   if (frameCount % 20 == 0) fps = frameRate();
   fill(255);
