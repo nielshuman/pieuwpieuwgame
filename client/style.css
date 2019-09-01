@@ -1,7 +1,32 @@
 html, body {
   margin: 0;
   padding: 0;
+  background-color: #214;
 }
 canvas {
   display: block;
+}
+h1, h2 {
+  color: #fff;
+  font-family: Arial;
+}
+
+/* NOSCRIPT */
+.sad {
+	font-size: 5em;
+}
+noscript {
+    height: 300px;
+    width: 500px;
+    text-align: center;
+    position: fixed;
+    background: #0002;
+    top: 50%;
+    left: 50%;
+    margin-top: -150px;
+    margin-left: -250px;
+}
+a {
+	color:#fff;
+	text-decoration: underline dotted;
 }
