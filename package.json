@@ -1,5 +1,5 @@
 {
-  "name": "websockets_p5_start",
+  "name": "p5 multiplayer game",
   "version": "1.0.0",
   "main": "server.js",
   "dependencies": {
@@ -10,8 +10,7 @@
   "scripts": {
     "start": "node server.js"
   },
-  "description": "Simple begin of multiplayer game",
+  "description": "multiplayer AAAaaAAaa",
   "devDependencies": {},
-  "author": "Niels Huisman",
-  "license": "ISC"
+  "author": "Niels Huisman"
 }

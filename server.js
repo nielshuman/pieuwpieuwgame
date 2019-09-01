@@ -9,6 +9,7 @@ const rand = (lo, hi) => lo + (hi - lo) * Math.random();
 const constrain = (n, lo, hi) => Math.max(Math.min(n, hi), lo);
 const randarray = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const floor = Math.floor;
+const abs = Math.abs;
 const randpos = function() {
   let x = rand(-world_radius, world_radius);
   let y = rand(-world_radius, world_radius);
@@ -57,15 +58,20 @@ class Bullet extends Rect {
     this.author = author;
     this.color = '#e22';
     this.spawn_time = spawn_time;
+    this.update_time = spawn_time;
+    this.update();
   }
-  update() {
-    const age = world.now() - this.spawn_time;
+  update(to_time='') {
+    const time = (to_time === '' ? world.now() : to_time);
+    const age = time - this.spawn_time;
     if (age > bullet_max_age) this.remove();
     this.x = this.x0 + this.vx * age;
     this.y = this.y0 + this.vy * age;
     for (let wall of world.walls) {
       if (this.hit(wall)) this.remove()
-    } // remove bullet if hit wall
+    }
+    this.prev_time = this.update_time;
+    this.update_time = time;
   }
   remove() {
     world.bullets.splice(world.bullets.indexOf(this), 1);
@@ -200,19 +206,16 @@ io.sockets.on('connection', socket => {
     })
 })
 
-// kind of main loop thing
+// Nu updaten de bullets 100x per sec :D
 function heartbeat() {
   for (let bullet of world.bullets) {
-    bullet.update();
+    while (bullet.update_time < world.now()) {
+      bullet.update(bullet.prev_time + 10)
+    } 
   }
   for (let player of world.players) { // only 'ready clients' update
     io.to(player.id).emit('server_update', world.players, world.bullets);
   }
-  // for (let wall of world.walls) {
-  // world.bullets = world.bullets.filter((value, index, arr) => !value.hits(wall))
-  // }
-  updateCount++;
 }
 
-let updateCount = 0;
 setInterval(heartbeat, argv.i);
