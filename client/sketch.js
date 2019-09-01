@@ -65,6 +65,13 @@ function draw() {
   for (let bb of world.bullets) {
     bb.update();
     bb.show();
+    if (player.hit(bb) && bb.author != socket.id) {
+      console.log('DOOD!')
+      socket.emit('bullet_dead', bb.id)
+      player.takeDamage();
+      hitSound.play();
+      world.bullets.splice(world.bullets.indexOf(bb), 1)
+    }
   }
   pop();
 

@@ -100,6 +100,10 @@ class Player extends SolidRect {
     const r = this.energy * TAU / 100;
     if (r > 0) arc(this.x + this.w / 2, this.y + this.h / 2, this.w * 2, this.h * 2, 1.5 * PI, 1.5 * PI + r);
   }
+
+  takeDamage(multiplier=1) {
+    this.energy = max(0, this.energy - (random(10,30) * multiplier));
+  }
 }
 
 class Bullet extends Rect {
@@ -118,6 +122,7 @@ class Bullet extends Rect {
     const b = new Bullet(o.x, o.y, o.vx, o.vy, o.author);
     b.x0 = o.x0;
     b.y0 = o.y0;
+    b.id = o.id;
     b.spawn_time = o.spawn_time;
     b.color = o.color;
     return b;

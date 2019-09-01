@@ -60,6 +60,7 @@ class Bullet extends Rect {
     this.spawn_time = spawn_time;
     this.update_time = spawn_time;
     this.update();
+    this.id = `${this.author}:${this.spawn_time}`
   }
   update(to_time='') {
     const time = (to_time === '' ? world.now() : to_time);
@@ -131,10 +132,16 @@ class World {
   }
 
   updatePlayer(id, p_new) {
-    let p = this.findPlayerById(id);
-    p.x = p_new.x;
-    p.y = p_new.y;
-    p.energy = p_new.energy;
+    try {
+      let p = this.findPlayerById(id);
+      p.x = p_new.x;
+      p.y = p_new.y;
+      p.energy = p_new.energy;
+    } catch(error) {
+      console.log(`Update of ${id.substring(16, 20)} failed! Client input: ${p_new}`)
+      // kick?
+    }
+
   }
 
   findPlayerById(id) {
@@ -199,11 +206,20 @@ io.sockets.on('connection', socket => {
       world.removePlayer(socket.id);
       world.newPlayer(socket);
       socket.emit('start', world.findPlayerById(socket.id), world);
-    })
+    });
 
     socket.on('bullet', (spawn_time, x, y, vx, vy) => {
       world.bullets.push(new Bullet(x, y, vx, vy, socket.id, spawn_time))
-    })
+    });
+    
+    socket.on('bullet_dead', (bid) => {
+      for (let b of world.bullets) {
+        console.log('bullet dood!', bid)
+        if (b.id == bid) {
+          b.remove()
+        }
+      }
+    });
 })
 
 // Nu updaten de bullets 100x per sec :D
