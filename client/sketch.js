@@ -54,7 +54,7 @@ function on_server_update(players, bullets) {
 }
 
 function draw() {
-  background("#214");
+  background("#76a");
   if (!ready) {return};
 
   let prev_time = time;
