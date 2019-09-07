@@ -67,7 +67,7 @@ class Bullet extends Rect {
     let age = this.prev_age;
     this.prev_age = new_age;
     if (age > bullet_max_age) {
-      this.remove("old");
+      this.remove();
       return;
     }
     while (age < new_age) {
@@ -75,16 +75,15 @@ class Bullet extends Rect {
       this.y = this.y0 + this.vy * age;
       for (let wall of world.walls) {
         if (this.hit(wall)) {
-          this.remove("hit wall");
+          this.remove();
           return;
         }
       }
       age += Bullet.MIN_DT
     }
   }
-  remove(why) {
+  remove() {
     world.bullets.splice(world.bullets.indexOf(this), 1);
-    console.log(`Removed bullet because ${why}. #bullets = ${world.bullets.length}`);
   }
 }
 Bullet.MIN_DT = 10;
@@ -226,7 +225,7 @@ io.sockets.on('connection', socket => {
     socket.on('bullet_hitplayer', (bid) => {
       for (let b of world.bullets) {
         if (b.id == bid) {
-          b.remove("hit player");
+          b.remove();
         }
       }
     });
