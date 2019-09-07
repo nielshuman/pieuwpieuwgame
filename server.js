@@ -58,26 +58,36 @@ class Bullet extends Rect {
     this.author = author;
     this.color = '#e22';
     this.spawn_time = spawn_time;
-    this.update_time = spawn_time;
+    this.prev_age = 0;
     this.update();
     this.id = `${this.author}:${this.spawn_time}`
   }
-  update(to_time='') {
-    const time = (to_time === '' ? world.now() : to_time);
-    const age = time - this.spawn_time;
-    if (age > bullet_max_age) this.remove();
-    this.x = this.x0 + this.vx * age;
-    this.y = this.y0 + this.vy * age;
-    for (let wall of world.walls) {
-      if (this.hit(wall)) this.remove()
+  update() {
+    const new_age = world.now() - this.spawn_time;
+    let age = this.prev_age;
+    this.prev_age = new_age;
+    if (age > bullet_max_age) {
+      this.remove("old");
+      return;
     }
-    this.prev_time = this.update_time;
-    this.update_time = time;
+    while (age < new_age) {
+      this.x = this.x0 + this.vx * age;
+      this.y = this.y0 + this.vy * age;
+      for (let wall of world.walls) {
+        if (this.hit(wall)) {
+          this.remove("hit wall");
+          return;
+        }
+      }
+      age += Bullet.MIN_DT
+    }
   }
-  remove() {
+  remove(why) {
     world.bullets.splice(world.bullets.indexOf(this), 1);
+    console.log(`Removed bullet because ${why}. #bullets = ${world.bullets.length}`);
   }
 }
+Bullet.MIN_DT = 10;
 
 class World {
   constructor() {
@@ -137,6 +147,7 @@ class World {
       p.x = p_new.x;
       p.y = p_new.y;
       p.energy = p_new.energy;
+      p.username = p_new.username;
     } catch(error) {
       console.log(`Update of ${id.substring(16, 20)} failed! Client input: ${p_new}`)
       // kick?
@@ -211,12 +222,11 @@ io.sockets.on('connection', socket => {
     socket.on('bullet', (spawn_time, x, y, vx, vy) => {
       world.bullets.push(new Bullet(x, y, vx, vy, socket.id, spawn_time))
     });
-    
-    socket.on('bullet_dead', (bid) => {
+
+    socket.on('bullet_hitplayer', (bid) => {
       for (let b of world.bullets) {
-        console.log('bullet dood!', bid)
         if (b.id == bid) {
-          b.remove()
+          b.remove("hit player");
         }
       }
     });
@@ -225,9 +235,10 @@ io.sockets.on('connection', socket => {
 // Nu updaten de bullets 100x per sec :D
 function heartbeat() {
   for (let bullet of world.bullets) {
-    while (bullet.update_time < world.now()) {
-      bullet.update(bullet.prev_time + 10)
-    } 
+    bullet.update();
+    // while (bullet.update_time < world.now()) {
+    //   bullet.update(bullet.prev_time + 10)
+    // }
   }
   for (let player of world.players) { // only 'ready clients' update
     io.to(player.id).emit('server_update', world.players, world.bullets);

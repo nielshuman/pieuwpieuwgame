@@ -1,14 +1,26 @@
 // p5.disableFriendlyErrors = true; // disables FES
+const names = ["pluisje", "vlekje", "kruimel", "poekie", "fluffie", "muffin",
+"diesel", "spike", "simba", "lucky", "spoekie", "tijger", "snuf", "pien",
+"woezel", "pip", "puck", "nugget"];
+const post_names = ["the destroyer", "the great", "the fool", "the conqueror",
+"of death", "doom", "the insane", "the indestructable", "the wicked",
+"the brutal", "frost", "the foul", "the pirate"];
+const pre_names = ["super", "mad ", "mega", "ultra", "hyper", "power", "giga",
+"insane ", "bad ", "zombie ", "ghost ", "robot ", "ninja ", "pirate ",
+"screaming ", "angry ", "happy ", "danger "];
 
+let username_box;
 let walls = [], player, ready, world, socket;
 let W, H, W2, H2, fps = 0;
 let time;
 
+let shootSound, hitSound, wallHitSound, font;
 function preload() {
   soundFormats('wav');
   shootSound = loadSound('assets/shoot.wav');
   hitSound = loadSound('assets/hit.wav');
   wallHitSound = loadSound('assets/hitwall.wav');
+  font = loadFont('assets/gamer.ttf');
 }
 
 function setup() {
@@ -19,6 +31,8 @@ function setup() {
   socket.on('server_update', on_server_update);
   socket.on('server_welcome', on_server_welcome);
   socket.emit('player_join');
+  username_box = select("#username");
+  username_box.value((random() < 0.5) ? random(names) + ' ' + random(post_names) : random(pre_names) + random(names));
 }
 
 function on_server_welcome(p, w) {
@@ -48,10 +62,10 @@ function draw() {
   dt = time - prev_time;
   // controls and movement
   let speed = 0.42 * dt;
-  if (keyIsDown(UP_ARROW)) { player.move(0, -speed); player.dir = 'up'; }
-  if (keyIsDown(DOWN_ARROW)) { player.move(0, speed); player.dir = 'down'; }
-  if (keyIsDown(LEFT_ARROW)) { player.move(-speed, 0); player.dir = 'left'; }
-  if (keyIsDown(RIGHT_ARROW)) { player.move(speed, 0); player.dir = 'right'; }
+  if (keyIsDown(87) || keyIsDown(UP_ARROW)) { player.move(0, -speed); player.dir = 'up'; }
+  if (keyIsDown(83) || keyIsDown(DOWN_ARROW)) { player.move(0, speed); player.dir = 'down'; }
+  if (keyIsDown(65) || keyIsDown(LEFT_ARROW)) { player.move(-speed, 0); player.dir = 'left'; }
+  if (keyIsDown(68) || keyIsDown(RIGHT_ARROW)) { player.move(speed, 0); player.dir = 'right'; }
 
   // rendering world
   push();
@@ -67,7 +81,7 @@ function draw() {
     bb.show();
     if (player.hit(bb) && bb.author != socket.id) {
       console.log('DOOD!')
-      socket.emit('bullet_dead', bb.id)
+      socket.emit('bullet_hitplayer', bb.id)
       player.takeDamage();
       hitSound.play();
       world.bullets.splice(world.bullets.indexOf(bb), 1)
@@ -82,17 +96,12 @@ function draw() {
   stroke(0);
   text(`FPS: ${fps.toFixed(2)}`, 10, height - 10);
   text(`NOW: ${world.now()}`, 10, height - 30);
+  player.username = username_box.value().substring(0, 26).toUpperCase();
+  if (player.energy > 0) player.energy = min(100, player.energy + 3 * dt / 1000);
 }
 
 function keyPressed() {
-  if (key == 'r') {
-    socket.emit('player_reset'); // TODO: fixen of weghalen
-    console.log("---------RESET--------");
-  } else if (key == 'q') {
-    console.log("---------EXIT--------");
-    socket.disconnect();
-    noLoop();
-  } else if (key == 'm') {
+  if (key == 'm') {
     if (getMasterVolume() == 0) {
       masterVolume(1);
       console.log('Unmuted');
@@ -124,8 +133,13 @@ function keyPressed() {
         vx = 1;
         break;
     }
-    socket.emit('bullet', world.now(), x, y, vx, vy);
-    shootSound.play();
+    const bullet_cost = 4;
+    if (player.energy > bullet_cost) {
+      player.energy -= bullet_cost;
+      let bullet_power = 17 - 0.1 * player.energy + random(-3, 3);
+      socket.emit('bullet', world.now(), x, y, vx, vy, bullet_power);
+      shootSound.play();
+    }
   } else if (key == 'x') {
       player.energy = max(0, player.energy - random(10,30));
   }

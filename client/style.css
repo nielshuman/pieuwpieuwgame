@@ -30,3 +30,17 @@ a {
 	color:#fff;
 	text-decoration: underline dotted;
 }
+#username {
+  height: 32px;
+  width: 320px;
+  position: fixed;
+  right: 8px; bottom: 8px;
+  padding: 4px;
+  background: #0008;
+  color: white;
+  font: bold 16px/32px Verdana, sans-serif;
+  border: none;
+  border-radius: 8px;
+  text-transform: uppercase;
+  text-align: center;
+}
