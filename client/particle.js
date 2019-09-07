@@ -14,8 +14,6 @@ function do_particles(dt) {
     p.update(dt);
     p.show();
   }
-  // remove dead particles
-  particles = particles.filter(p => p.age >= 0);
 }
 
 class Particle {
@@ -23,23 +21,22 @@ class Particle {
     this.x = x;
     this.y = y;
     this.radius = random(3, 8);
-    this.vx = random(-15, 15);
-    this.vy = random(-15, 15);
-    this.age = random(20, 30);
+    this.vx = random(-0.5, 0.5);
+    this.vy = random(-0.5, 0.5);
+    this.age = random(100, 200) ;
     this.c = c;
   }
   update(dt) {
-    if (this.age < 0) return;
-    this.x += this.vx;
-    this.y += this.vy;
-    age -= dt;
+    this.x += this.vx * dt;
+    this.y += this.vy * dt;
+    this.age -= dt;
+    if (this.age < 0) this.remove();
   }
   show() {
-    if (this.age < 0) return;
     noStroke(); fill(this.c);
     circle(this.x, this.y, this.radius);
   }
   remove() {
-
+    particles.splice(particles.indexOf(this), 1);
   }
 }
