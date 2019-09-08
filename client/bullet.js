@@ -27,11 +27,6 @@ class Bullet extends Rect {
     for (let wall of world.walls) {
       if (this.hit(wall)) {
         this.remove();
-        const mx = this.x + this.w / 2, my = this.y + this.h / 2;
-        particle_fx(mx, my, 150, "#000");
-        particle_fx(mx, my, 100, "#f00");
-        particle_fx(mx, my, 75, "#f0f");
-        particle_fx(mx, my, 50, "#fff");
         return;
       }
     }
@@ -43,14 +38,24 @@ class Bullet extends Rect {
       this.remove();
     }
   }
-  remove() {
+  remove(explode=true) {
     world.bullets.splice(world.bullets.indexOf(this), 1);
+    if (explode) {
+      const mx = this.x + this.w / 2, my = this.y + this.h / 2;
+      particle_fx(mx, my, 150, "#000");
+      particle_fx(mx, my, 100, "#f00");
+      particle_fx(mx, my, 75, "#f0f");
+      particle_fx(mx, my, 50, "#fff");
+    }
   }
   show() {
     noStroke();
     fill(this.color);
     rect(this.x, this.y, this.w, this.h, 5, 5);
-    fill(this.color2);
-    rect(this.x + 3, this.y + 3, this.w - 6, this.h - 6, 5, 5);
+    // fill(this.color2);
+    // rect(this.x + 3, this.y + 3, this.w - 6, this.h - 6, 5, 5);
   }
 }
+Bullet.MIN_DT = 10;
+Bullet.speed = 0.5;
+Bullet.max_age = world_size / bullet_speed;

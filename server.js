@@ -1,9 +1,6 @@
 const player_size = 32;
 const world_radius = 1000;
 const world_size = world_radius * 2
-const bullet_length = 60;
-const bullet_speed = 1, bullet_max_age = world_size / bullet_speed;
-
 
 const rand = (lo, hi) => lo + (hi - lo) * Math.random();
 const constrain = (n, lo, hi) => Math.max(Math.min(n, hi), lo);
@@ -45,13 +42,13 @@ class Player extends Rect {
 class Bullet extends Rect {
   constructor (x, y, vx, vy, author='None', spawn_time) {
     if (vx != 0) {
-      super(x, y, bullet_length, 10); ///aaaaa
-      this.vx = bullet_speed * Math.sign(vx);
+      super(x, y, 30, 10); ///aaaaa
+      this.vx = Bullet.speed * Math.sign(vx);
       this.vy = 0;
     } else if (vy != 0) {
-      super(x, y, 10, bullet_length);
+      super(x, y, 10, 30);
       this.vx = 0;
-      this.vy = bullet_speed * Math.sign(vy);
+      this.vy = Bullet.speed * Math.sign(vy);
     }
     this.x0 = x;
     this.y0 = y;
@@ -66,7 +63,7 @@ class Bullet extends Rect {
     const new_age = world.now() - this.spawn_time;
     let age = this.prev_age;
     this.prev_age = new_age;
-    if (age > bullet_max_age) {
+    if (age > Bullet.max_age) {
       this.remove();
       return;
     }
@@ -87,6 +84,9 @@ class Bullet extends Rect {
   }
 }
 Bullet.MIN_DT = 10;
+Bullet.speed = 0.5;
+Bullet.max_age = world_size / Bullet.speed;
+
 
 class World {
   constructor() {
