@@ -33,6 +33,7 @@ function setup() {
   socket.emit('player_join');
   username_box = select("#username");
   username_box.value((random() < 0.5) ? random(names) + ' ' + random(post_names) : random(pre_names) + random(names));
+      masterVolume(0);
 }
 
 function on_server_welcome(p, w) {
@@ -103,7 +104,7 @@ function keyPressed() {
       masterVolume(0);
       console.log('Muted');
     }
-  } else if (key == ' ') {
+  } else if (key == ' ' || key == 'b') {
     let vx = 0, vy = 0, x, y;
     switch (player.dir) {
       case 'up':
@@ -127,7 +128,7 @@ function keyPressed() {
         vx = 1;
         break;
     }
-    const bullet_cost = 4;
+    const bullet_cost = (key == ' ') ? 4 : 0; // 'b' is cheat free bullet
     if (player.energy > bullet_cost) {
       player.energy -= bullet_cost;
       let bullet_power = 17 - 0.1 * player.energy + random(-3, 3);

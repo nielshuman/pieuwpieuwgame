@@ -26,7 +26,11 @@ class Bullet extends Rect {
     for (let wall of world.walls) {
       if (this.hit(wall)) {
         this.remove();
-        particle_fx(this.x, this.y, "#fff");
+        const mx = this.x + this.w / 2, my = this.y + this.h / 2;
+        particle_fx(mx, my, 150, "#000");
+        particle_fx(mx, my, 100, "#f00");
+        particle_fx(mx, my, 75, "#f0f");
+        particle_fx(mx, my, 50, "#fff");
         return;
       }
     }
