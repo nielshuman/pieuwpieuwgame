@@ -54,6 +54,7 @@ function on_server_update(players, bullets) {
   socket.emit('player_update', player);
 }
 
+let screenshake = 0;
 function draw() {
   background("#76a");
   if (!ready) {return};
@@ -71,6 +72,10 @@ function draw() {
   // rendering world
   push();
   translate(W2 - player.x - player.w / 2, H2 - player.y - player.h / 2);
+  if (screenshake > 0) {
+    screenshake--;
+    translate(random(-8, 8), random(-8, 8));
+  }
   for (let wall of world.walls) {
     wall.show();
   }

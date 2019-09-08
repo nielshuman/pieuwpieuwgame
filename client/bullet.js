@@ -57,6 +57,7 @@ class Bullet extends Rect {
     particle_fx(mx, my, 100, 20, "#f00");
     particle_fx(mx, my, 75, 20, "#f0f");
     particle_fx(mx, my, 50, 20, "#fff");
+    screenshake = 3;
   }
   show() {
     noStroke();
