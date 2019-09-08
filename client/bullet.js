@@ -7,6 +7,7 @@ class Bullet extends Rect {
     }
     this.author = author;
     this.color = '#e22';
+    this.color2 = lerpColor(color(this.color), color("#fff"), 0.5)
     this.vx = vx;
     this.vy = vy;
   }
@@ -49,5 +50,7 @@ class Bullet extends Rect {
     noStroke();
     fill(this.color);
     rect(this.x, this.y, this.w, this.h, 5, 5);
+    fill(this.color2);
+    rect(this.x + 3, this.y + 3, this.w - 6, this.h - 6, 5, 5);
   }
 }
