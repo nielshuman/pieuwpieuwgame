@@ -56,6 +56,7 @@ class Bullet extends Rect {
     this.color = '#e22';
     this.spawn_time = spawn_time;
     this.prev_age = 0;
+    this.max_age = Bullet.max_age;
     this.update();
     this.id = `${this.author}:${this.spawn_time}`
   }
@@ -63,7 +64,8 @@ class Bullet extends Rect {
     const new_age = world.now() - this.spawn_time;
     let age = this.prev_age;
     this.prev_age = new_age;
-    if (age > Bullet.max_age) {
+
+    if (age >= this.max_age) {
       this.remove();
       return;
     }
@@ -72,7 +74,7 @@ class Bullet extends Rect {
       this.y = this.y0 + this.vy * age;
       for (let wall of world.walls) {
         if (this.hit(wall)) {
-          this.remove();
+          this.max_age = age;
           return;
         }
       }
@@ -84,7 +86,7 @@ class Bullet extends Rect {
   }
 }
 Bullet.MIN_DT = 10;
-Bullet.speed = 0.5;
+Bullet.speed = 0.75;
 Bullet.max_age = world_size / Bullet.speed;
 
 
@@ -235,9 +237,6 @@ io.sockets.on('connection', socket => {
 function heartbeat() {
   for (let bullet of world.bullets) {
     bullet.update();
-    // while (bullet.update_time < world.now()) {
-    //   bullet.update(bullet.prev_time + 10)
-    // }
   }
   for (let player of world.players) { // only 'ready clients' update
     io.to(player.id).emit('server_update', world.players, world.bullets);

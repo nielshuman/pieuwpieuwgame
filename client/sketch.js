@@ -134,6 +134,8 @@ function keyPressed() {
       let bullet_power = 17 - 0.1 * player.energy + random(-3, 3);
       socket.emit('bullet', world.now(), x, y, vx, vy, bullet_power);
       shootSound.play();
+      particle_fx(player.mx + vx * player.w, player.my + vy * player.h, 50, 5, "#fff");
+
     }
   } else if (key == 'x') {
       player.energy = max(0, player.energy - random(10,30));

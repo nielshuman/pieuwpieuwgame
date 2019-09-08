@@ -21,6 +21,8 @@ class Rect {
             this.y + this.h >= other.y &&    // r1 top edge past r2 bottom
             this.y <= other.y + other.h);
   }
+  get mx() { return this.x + this.w * 0.5; }
+  get my() { return this.y + this.h * 0.5; }
 }
 
 class SolidRect extends Rect {
