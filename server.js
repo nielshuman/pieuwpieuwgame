@@ -40,7 +40,7 @@ class Player extends Rect {
 }
 
 class Bullet extends Rect {
-  constructor (x, y, vx, vy, author='None', spawn_time) {
+  constructor (x, y, vx, vy, author='None', spawn_time, power) {
     if (vx != 0) {
       super(x, y, 30, 10); ///aaaaa
       this.vx = Bullet.speed * Math.sign(vx);
@@ -59,6 +59,7 @@ class Bullet extends Rect {
     this.max_age = Bullet.max_age;
     this.update();
     this.id = `${this.author}:${this.spawn_time}`
+    this.power = power;
   }
   update() {
     const new_age = world.now() - this.spawn_time;
@@ -220,8 +221,8 @@ io.sockets.on('connection', socket => {
       socket.emit('start', world.findPlayerById(socket.id), world);
     });
 
-    socket.on('bullet', (spawn_time, x, y, vx, vy) => {
-      world.bullets.push(new Bullet(x, y, vx, vy, socket.id, spawn_time))
+    socket.on('bullet', (spawn_time, x, y, vx, vy, bullet_power) => {
+      world.bullets.push(new Bullet(x, y, vx, vy, socket.id, spawn_time, bullet_power))
     });
 
     socket.on('bullet_hitplayer', (bid) => {

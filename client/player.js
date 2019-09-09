@@ -40,7 +40,7 @@ class Player extends SolidRect {
     pop();
   }
 
-  takeDamage(multiplier=1) {
-    this.energy = max(0, this.energy - (random(10,30) * multiplier));
+  takeDamage(amount=20, rndm=false) {
+    this.energy = max(0, this.energy - ((rndm ? random(-10, 10) : 0) + amount));
   }
 }

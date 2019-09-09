@@ -1,4 +1,4 @@
-// p5.disableFriendlyErrors = true; // disables FES
+p5.disableFriendlyErrors = true; // disables FES
 const names = ["pluisje", "vlekje", "kruimel", "poekie", "fluffie", "muffin",
 "diesel", "spike", "simba", "lucky", "spoekie", "tijger", "snuf", "pien",
 "woezel", "pip", "puck", "nugget"];
@@ -89,8 +89,6 @@ function draw() {
   do_particles(dt);
   pop();
 
-  // hbar.updateval(frameCount / 10);
-  // hbar.show();
   if (frameCount % 20 == 0) fps = frameRate();
   fill(255);
   stroke(0);
