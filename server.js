@@ -2,6 +2,11 @@ const player_size = 32;
 const world_radius = 1000;
 const world_size = world_radius * 2
 
+const log = (level, text) => {
+  if (level <= log_level) console.log(`[${level}] ${text}`);
+  //tijd?
+}
+
 const rand = (lo, hi) => lo + (hi - lo) * Math.random();
 const constrain = (n, lo, hi) => Math.max(Math.min(n, hi), lo);
 const randarray = (arr) => arr[Math.floor(Math.random() * arr.length)];
@@ -84,6 +89,7 @@ class Bullet extends Rect {
   }
   remove() {
     world.bullets.splice(world.bullets.indexOf(this), 1);
+    log(4, 'Bullet removed!')
   }
 }
 Bullet.MIN_DT = 10;
@@ -118,6 +124,7 @@ class World {
         this.walls.push(wall);
       }
     }
+    log(4, 'world constructed!')
   }
 
   now() { return Date.now() - this.start_time; }
@@ -151,7 +158,7 @@ class World {
       p.energy = p_new.energy;
       p.username = p_new.username;
     } catch(error) {
-      console.log(`Update of ${id.substring(16, 20)} failed! Client input: ${p_new}`)
+      log(1, `Update of ${id.substring(16, 20)} failed! Client input: ${p_new}`)
       // kick?
     }
 
@@ -176,13 +183,20 @@ var argv = require('yargs')
       default: 100, // 10 Hz
       describe: 'Interval in miliseconds of sending data'
     })
+    .option('log_level', {
+      alias: 'l',
+      default: 3,
+      describe: 'Amount of log, 4=everything, 3=normal, 2=only join/error/system, 1=only error/system'
+    })
     .help()
     .argv;
+
+const log_level = argv.l; // 4=everything, 3=normal, 2=only join/error/system,  1=only error/system
 
 // Http server
 let express = require('express');
 let app = express();
-const listening = function() {console.log('Server listening at port ' + server.address().port);};
+const listening = function() {log(1, 'Server listening at port ' + server.address().port);};
 let server = app.listen(argv.p, listening); // listen() if server started
 app.use(express.static('client'));
 
@@ -195,10 +209,10 @@ let io = require('socket.io')(server); // socket.io uses http server
 
 io.sockets.on('connection', socket => {
     let id = socket.id.substring(16, 20) // last 4 charaters are less nonsense
-    console.log('New client: ' + id);
+    log(2, 'New client: ' + id);
 
     socket.on('player_join', () => {
-        console.log(id + ' joined the game');
+        log(2, id + ' joined the game');
         let new_player = world.newPlayer(socket);
         world.age = world.now();
         socket.emit('server_welcome', new_player, world);
@@ -211,17 +225,18 @@ io.sockets.on('connection', socket => {
 
     socket.on('disconnect', () => {
       world.removePlayer(socket.id); // remove zombie players
-      console.log(id + ' disconnected');
+      log(2, id + ' disconnected');
     });
 
     socket.on('player_reset', () => {
-      console.log('Resetting ' + id)
+      log(3, 'Resetting ' + id)
       world.removePlayer(socket.id);
       world.newPlayer(socket);
       socket.emit('start', world.findPlayerById(socket.id), world);
     });
 
     socket.on('bullet', (spawn_time, x, y, vx, vy, bullet_power) => {
+      log(4,'Recieved bullet emit from ' + id)
       world.bullets.push(new Bullet(x, y, vx, vy, socket.id, spawn_time, bullet_power))
     });
 
