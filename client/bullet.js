@@ -60,11 +60,8 @@ class Bullet extends Rect {
   }
   explode() {
     const mx = this.mx, my = this.my;
-    particle_fx(mx, my, 150, 20, "#000");
-    particle_fx(mx, my, 100, 20, "#f00");
-    particle_fx(mx, my, 75, 20, "#f0f");
-    particle_fx(mx, my, 50, 20, "#fff");
-    screenshake = 3;
+    fx_explosion(mx, my);
+    if (this.hit(screen_rect)) screenshake = 3;
   }
   show() {
     noStroke();

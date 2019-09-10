@@ -72,7 +72,7 @@ function draw() {
   // rendering world
   push();
   translate(W2 - player.mx, H2 - player.my);
-  // screen_rect = new Rect(player.x + player)
+  screen_rect = new Rect(player.mx - W2, player.my - H2, W, H);
   if (screenshake > 0) {
     screenshake--;
     translate(random(-8, 8), random(-8, 8));
