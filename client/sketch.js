@@ -11,7 +11,7 @@ const pre_names = ["super", "mad ", "mega", "ultra", "hyper", "power", "giga",
 
 let username_box;
 let walls = [], player, ready, world, socket;
-let W, H, W2, H2, fps = 0;
+let W, H, W2, H2, fps = 0, screen_rect;
 let time;
 
 let shootSound, hitSound, wallHitSound, font;
@@ -71,7 +71,8 @@ function draw() {
 
   // rendering world
   push();
-  translate(W2 - player.x - player.w / 2, H2 - player.y - player.h / 2);
+  translate(W2 - player.mx, H2 - player.my);
+  // screen_rect = new Rect(player.x + player)
   if (screenshake > 0) {
     screenshake--;
     translate(random(-8, 8), random(-8, 8));
@@ -82,9 +83,9 @@ function draw() {
   for (let p of world.players) {
     (p.id == player.id ? player : p).show();
   }
-  for (let bb of world.bullets) {
-    bb.update();
-    bb.show();
+  for (let b of world.bullets) {
+    b.update();
+    b.show();
   }
   do_particles(dt);
   pop();
@@ -109,15 +110,15 @@ function keyPressed() {
     }
   } else if (key == ' ' || key == 'b') {
     let dx = player.dx, dy = player.dy;
-    let x = player.mx + dx * player.w / 2;
-    let y = player.my + dy * player.h / 2;
+    let x = player.mx + dx * player.w;
+    let y = player.my + dy * player.h;
     const bullet_cost = (key == ' ') ? 4 : 0; // 'b' is cheat free bullet
     if (player.energy > bullet_cost) {
       player.energy -= bullet_cost;
       let bullet_power = 17 - 0.1 * player.energy + random(-3, 3);
       socket.emit('bullet', world.now(), x, y, dx, dy, bullet_power);
       shootSound.play();
-      particle_fx(player.mx + dx * player.w, player.my + dy * player.h, 50, 5, "#fff");
+      particle_fx(x, y, 50, 5, "#fff");
 
     }
   } else if (key == 'x') {

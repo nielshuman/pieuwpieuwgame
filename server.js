@@ -47,15 +47,17 @@ class Player extends Rect {
 
 class Bullet extends Rect {
   constructor (x, y, vx, vy, author='None', spawn_time, power) {    
+    vx = Math.sign(vx);
+    vy = Math.sign(vy)
     if (vx == 0) { // position bullet at centre point
       super(x - 5, y - 15, 10, 30);
     } else {
       super(x - 15, y - 5, 30, 10); 
     }
-    this.vx = Bullet.speed * Math.sign(vx);
-    this.vy = Bullet.speed * Math.sign(vy);
-    this.x0 = x;
-    this.y0 = y;
+    this.vx = Bullet.speed * vx;
+    this.vy = Bullet.speed * vy;
+    this.x0 = this.x;
+    this.y0 = this.y;
     this.author = author;
     this.color = '#e22';
     this.spawn_time = spawn_time;
