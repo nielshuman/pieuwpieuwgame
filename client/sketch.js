@@ -110,16 +110,15 @@ function keyPressed() {
     }
   } else if (key == ' ' || key == 'b') {
     let dx = player.dx, dy = player.dy;
-    let x = player.mx + dx * player.w;
-    let y = player.my + dy * player.h;
+    let x = player.mx + dx * player.w / 2;
+    let y = player.my + dy * player.h / 2;
     const bullet_cost = (key == ' ') ? 4 : 0; // 'b' is cheat free bullet
     if (player.energy > bullet_cost) {
       player.energy -= bullet_cost;
       let bullet_power = 17 - 0.1 * player.energy + random(-3, 3);
       socket.emit('bullet', world.now(), x, y, dx, dy, bullet_power);
       shootSound.play();
-      particle_fx(x, y, 50, 5, "#fff");
-
+      fx_shoot(x, y, dx, dy);
     }
   } else if (key == 'x') {
       player.energy = max(0, player.energy - random(10,30));
