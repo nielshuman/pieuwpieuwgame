@@ -25,32 +25,34 @@ class Bullet extends Rect {
   }
   update() {
     const age = world.now() - this.spawn_time;
-    if (age >= this.max_age) {
+    if (age >= this.max_age) { // if old
         this.remove();
         this.explode();
         return;      
     }
     this.x = this.x0 + this.vx * age;
     this.y = this.y0 + this.vy * age;
-    for (let wall of world.walls) {
+    for (let wall of world.walls) { // if hit wall
       if (this.hit(wall)) {
         this.remove();
         this.explode();
         return;
       }
     }
-    for (let player of world.players){
-      if (this.hit(player) && player.id != socket.id){
+    for (let p of world.players) { // if hit a player
+      if (this.hit(p) && p.id != socket.id) {
+        hitSound.play();
         this.explode();
+        this.remove();
       }
     }
-    if (this.hit(player) && this.author != socket.id) {
+    if (this.hit(player) && this.author != socket.id) { // if hit this player
       console.log('DOOD!');
       socket.emit('bullet_hitplayer', this.id);
       player.takeDamage(this.power);
       hitSound.play();
-      this.remove();
       this.explode();
+      this.remove();
     }
   }
   remove() {
