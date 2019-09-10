@@ -41,20 +41,19 @@ class Player extends Rect {
     this.id = id;
     this.energy = 100;
     this.join_time = world.now();
+    this.dx = 0; this.dy = -1;
   }
 }
 
 class Bullet extends Rect {
-  constructor (x, y, vx, vy, author='None', spawn_time, power) {
-    if (vx != 0) {
-      super(x, y, 30, 10); ///aaaaa
-      this.vx = Bullet.speed * Math.sign(vx);
-      this.vy = 0;
-    } else if (vy != 0) {
-      super(x, y, 10, 30);
-      this.vx = 0;
-      this.vy = Bullet.speed * Math.sign(vy);
+  constructor (x, y, vx, vy, author='None', spawn_time, power) {    
+    if (vx == 0) { // position bullet at centre point
+      super(x - 5, y - 15, 10, 30);
+    } else {
+      super(x - 15, y - 5, 30, 10); 
     }
+    this.vx = Bullet.speed * Math.sign(vx);
+    this.vy = Bullet.speed * Math.sign(vy);
     this.x0 = x;
     this.y0 = y;
     this.author = author;

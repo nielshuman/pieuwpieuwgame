@@ -40,13 +40,13 @@ class Bullet extends Rect {
       }
     }
     for (let p of world.players) { // if hit a player
-      if (this.hit(p) && p.id != socket.id) {
+      if (this.hit(p) && p.id != player.id) {
         hitSound.play();
         this.explode();
         this.remove();
       }
     }
-    if (this.hit(player) && this.author != socket.id) { // if hit this player
+    if (this.hit(player) && this.author != player.id) { // if hit this player
       console.log('DOOD!');
       socket.emit('bullet_hitplayer', this.id);
       player.takeDamage(this.power);

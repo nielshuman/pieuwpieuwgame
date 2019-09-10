@@ -64,10 +64,10 @@ function draw() {
   dt = time - prev_time;
   // controls and movement
   let speed = 0.42 * dt;
-  if (keyIsDown(87) || keyIsDown(UP_ARROW)) { player.move(0, -speed); player.dir = 'up'; }
-  if (keyIsDown(83) || keyIsDown(DOWN_ARROW)) { player.move(0, speed); player.dir = 'down'; }
-  if (keyIsDown(65) || keyIsDown(LEFT_ARROW)) { player.move(-speed, 0); player.dir = 'left'; }
-  if (keyIsDown(68) || keyIsDown(RIGHT_ARROW)) { player.move(speed, 0); player.dir = 'right'; }
+  if (keyIsDown(87) || keyIsDown(UP_ARROW)) { player.move(0, -speed); }
+  if (keyIsDown(83) || keyIsDown(DOWN_ARROW)) { player.move(0, speed); }
+  if (keyIsDown(65) || keyIsDown(LEFT_ARROW)) { player.move(-speed, 0); }
+  if (keyIsDown(68) || keyIsDown(RIGHT_ARROW)) { player.move(speed, 0); }
 
   // rendering world
   push();
@@ -108,36 +108,16 @@ function keyPressed() {
       console.log('Muted');
     }
   } else if (key == ' ' || key == 'b') {
-    let vx = 0, vy = 0, x, y;
-    switch (player.dir) {
-      case 'up':
-        x = player.x + (player.w / 2) - 5;
-        y = player.y;
-        vy = - 1;
-        break;
-      case 'down':
-        x = player.x + (player.w / 2) - 5;
-        y = (player.y + player.h) - 10;
-        vy = 1;
-        break;
-      case 'left':
-        x = player.x;
-        y = player.y + (player.h / 2) - 5;
-        vx = -1;
-        break;
-      case 'right':
-        x = (player.x + player.w) - 10;
-        y = player.y + (player.h / 2) - 5;
-        vx = 1;
-        break;
-    }
+    let dx = player.dx, dy = player.dy;
+    let x = player.mx + dx * player.w / 2;
+    let y = player.my + dy * player.h / 2;
     const bullet_cost = (key == ' ') ? 4 : 0; // 'b' is cheat free bullet
     if (player.energy > bullet_cost) {
       player.energy -= bullet_cost;
       let bullet_power = 17 - 0.1 * player.energy + random(-3, 3);
-      socket.emit('bullet', world.now(), x, y, vx, vy, bullet_power);
+      socket.emit('bullet', world.now(), x, y, dx, dy, bullet_power);
       shootSound.play();
-      particle_fx(player.mx + vx * player.w, player.my + vy * player.h, 50, 5, "#fff");
+      particle_fx(player.mx + dx * player.w, player.my + dy * player.h, 50, 5, "#fff");
 
     }
   } else if (key == 'x') {
