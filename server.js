@@ -1,11 +1,13 @@
 const player_size = 32;
-const world_radius = 1000;
-const world_size = world_radius * 2
+let world_radius = 1000;
+let world_size = world_radius * 2
+let log_level = 3;
 
 const log = (level, text) => {
   if (level <= log_level) console.log(`[${level}] ${text}`);
   //tijd?
 }
+
 
 const rand = (lo, hi) => lo + (hi - lo) * Math.random();
 const constrain = (n, lo, hi) => Math.max(Math.min(n, hi), lo);
@@ -187,14 +189,23 @@ var argv = require('yargs')
     })
     .option('log_level', {
       alias: 'l',
-      default: 3,
+      default: log_level,
       describe: 'Amount of log, 4=everything, 3=normal, 2=only join/error/system, 1=only error/system'
+    })
+    .option('world_radius', {
+      default: world_radius,
+      describe: 'Size of world'
     })
     .help()
     .argv;
 
-const log_level = argv.l; // 4=everything, 3=normal, 2=only join/error/system,  1=only error/system
+log_level = argv.l; // 4=everything, 3=normal, 2=only join/error/system,  1=only error/system
+world_radius = argv.world_radius;
+world_size = world_radius * 2
 
+log(4, 'log_level = ' + log_level)
+log(4, 'world_radius = ' + world_radius)
+log(4, 'Starting server!')
 // Http server
 let express = require('express');
 let app = express();
@@ -221,7 +232,6 @@ io.sockets.on('connection', socket => {
     });
 
     socket.on('player_update', (p) => {
-      // TODO: sanity check p
       world.updatePlayer(socket.id, p);
     });
 
