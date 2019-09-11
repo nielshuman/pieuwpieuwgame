@@ -56,7 +56,7 @@ function on_server_update(players, bullets) {
 
 let screenshake = 0;
 function draw() {
-  background("#76a");
+  background("#123");
   if (!ready) {return};
 
   let prev_time = time;

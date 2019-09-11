@@ -2,9 +2,9 @@ const particles = [];
 
 // call to create particle explosion
 // tip: call multiple times with differnt colours
-function particle_fx(N, x0, y0, c, t=100, r=0.1, dx=0, dy=0) {
+function particle_fx(N, x0, y0, c, t=100, j=0.1, dx=0, dy=0, r=0.02) {
   for (let i = 0; i < N; i++) {
-    particles.push(new Particle(x0, y0, c, t, r, dx, dy));
+    particles.push(new Particle(x0, y0, c, t, j, dx, dy, r));
   }
 }
 
@@ -28,13 +28,14 @@ function do_particles(dt) {
 }
 
 class Particle {
-  constructor(x, y, c, t, r, dx, dy) {
+  constructor(x, y, c, t, j, dx, dy, r) {
     this.x = x;
     this.y = y;
-    this.vx = random(-1, 1) * r + dx;
-    this.vy = random(-1, 1) * r + dy;
+    this.vx = random(-1, 1) * j + dx;
+    this.vy = random(-1, 1) * j + dy;
     this.timer = random(1, 2) * t * 5;
     this.c = c;
+    this.r = r;
   }
   update(dt) {
     this.x += this.vx * dt;
@@ -44,7 +45,7 @@ class Particle {
   }
   show() {
     noStroke(); fill(this.c);
-    circle(this.x, this.y, this.timer * 0.02);
+    circle(this.x, this.y, this.timer * this.r);
   }
   remove() {
     particles.splice(particles.indexOf(this), 1);

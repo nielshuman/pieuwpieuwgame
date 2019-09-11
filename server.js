@@ -106,22 +106,23 @@ class World {
     this.start_time = Date.now();
 
     // outside walls
+    let c = 'hsl(225, 35%, 55%)';
     this.walls.push(
-      new Rect(-world_radius - 10, -world_radius - 10, 10, world_size + 30),
-      new Rect( world_radius + 10, -world_radius - 10, 10, world_size + 30),
-      new Rect(-world_radius - 10, -world_radius - 10, world_size + 20, 10),
-      new Rect(-world_radius, world_radius + 10, world_size + 20, 10)
+      new Rect(-world_radius - 10, -world_radius - 10, 10, world_size + 30, c),
+      new Rect( world_radius + 10, -world_radius - 10, 10, world_size + 30, c),
+      new Rect(-world_radius - 10, -world_radius - 10, world_size + 20, 10, c),
+      new Rect(-world_radius, world_radius + 10, world_size + 20, 10, c)
     )
 
     // random level walls
-    const g = 125, s = 25;
+    const g = 200, s = 30;
     for (let x = -world_radius; x < world_radius; x += g) {
       for (let y =  -world_radius; y < world_radius; y += g) {
         if (Math.random() < 0.5) continue;
         let w = randarray([s, g + s]);
         let h = randarray([s, g + s]);
         let wall = new Rect(x, y, w, h);
-        wall.color = `hsl(${floor(rand(240, 300))}, 10%, ${rand(5, 15)}%)`;
+        wall.color = `hsl(${floor(225 + rand(-30, 30))}, 35%, ${rand(45, 65)}%)`;
         this.walls.push(wall);
       }
     }
