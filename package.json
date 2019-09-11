@@ -1,16 +1,22 @@
 {
-  "name": "p5 multiplayer game",
-  "version": "1.0.0",
+  "name": "p5-multiplayer-game",
+  "version": "2.0.0",
+  "description": "Cool multiplayer game backend!",
   "main": "server.js",
-  "dependencies": {
-    "express": "^4.17.1",
-    "socket.io": "^1.7.4",
-    "yargs": "^13.2.4"
-  },
+  "dependencies": {},
+  "devDependencies": {},
   "scripts": {
+    "test": "node server --help",
     "start": "node server.js"
   },
-  "description": "multiplayer AAAaaAAaa",
-  "devDependencies": {},
-  "author": "Niels Huisman"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UltraNiels/p5-multiplayer-game.git"
+  },
+  "author": "Niels & Piter",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/UltraNiels/p5-multiplayer-game/issues"
+  },
+  "homepage": "https://github.com/UltraNiels/p5-multiplayer-game#readme"
 }
