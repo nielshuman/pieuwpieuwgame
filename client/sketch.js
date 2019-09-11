@@ -25,7 +25,8 @@ function preload() {
 
 function setup() {
   // frameRate(30);
-  createCanvas(windowWidth, windowHeight);
+  let canvas = createCanvas(windowWidth, windowHeight);
+  canvas.parent('#game_canvas')
   W = width; H = height; W2 = W / 2; H2 = H / 2;
   socket = io();
   socket.on('server_update', on_server_update);
@@ -33,7 +34,7 @@ function setup() {
   socket.emit('player_join');
   username_box = select("#username");
   username_box.value((random() < 0.5) ? random(names) + ' ' + random(post_names) : random(pre_names) + random(names));
-      masterVolume(0);
+  masterVolume(0);
 }
 
 function on_server_welcome(p, w) {
@@ -45,6 +46,7 @@ function on_server_welcome(p, w) {
   player.hit_list = world.walls;
   player.color = p.color;
   ready = true;
+  // select('#loading').remove()
   // hbar = new Bar(width -220, height - 50, 200, 30);
 }
 
@@ -78,10 +80,10 @@ function draw() {
     translate(random(-8, 8), random(-8, 8));
   }
   for (let wall of world.walls) {
-    wall.show();
+    if (wall.hit(screen_rect)) wall.show();
   }
   for (let p of world.players) {
-    (p.id == player.id ? player : p).show();
+    if (p.hit(screen_rect)) (p.id == player.id ? player : p).show();
   }
   for (let b of world.bullets) {
     b.update();

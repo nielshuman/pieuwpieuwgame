@@ -15,7 +15,7 @@ h1, h2 {
 .sad {
 	font-size: 5em;
 }
-noscript {
+noscript, #loading {
     height: 300px;
     width: 500px;
     text-align: center;

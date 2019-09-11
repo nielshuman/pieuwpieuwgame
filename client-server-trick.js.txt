@@ -6,6 +6,8 @@
 
 }(typeof exports === 'undefined' ? this.share = {} : exports));
 
+
+
 // On the server side just use:
 //
 // var share = require('./share.js');
@@ -14,4 +16,3 @@
 // And on the client side just load the js file and then use
 //
 // share.test();
-

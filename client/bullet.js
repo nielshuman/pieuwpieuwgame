@@ -74,4 +74,4 @@ class Bullet extends Rect {
 }
 Bullet.MIN_DT = 10;
 Bullet.speed = 0.75;
-Bullet.max_age = 2000 / bullet_speed;
+Bullet.max_age = 2000 / Bullet.speed;
