@@ -8,7 +8,8 @@ class Player extends SolidRect {
     const p = new Player(o.x, o.y, o.w, o.h, o.color, o.energy, o.id);
     p.join_time = o.join_time;
     p.username = o.username;
-    p.dx = o.dx; p.dy = o.dy;
+    p.dx = o.dx;
+    p.dy = o.dy;
     return p;
   }
   move(dx, dy) {
@@ -47,9 +48,5 @@ class Player extends SolidRect {
     fill(this.energy > 0 ? "#fffa" : "#fff6"); stroke("#0008"); strokeWeight(1.0);
     text(this.username, 0, h2 + 36);
     pop();
-  }
-
-  takeDamage(amount=20, rndm=false) {
-    this.energy = max(0, this.energy - ((rndm ? random(-10, 10) : 0) + amount));
   }
 }

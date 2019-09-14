@@ -39,6 +39,8 @@ function setup() {
 
 function on_server_welcome(p, w) {
   // start signal from server
+  // bullets are not initialized so any bullets flying when the player joins
+  // are not visible. but maybe hit the player?
   world = new World(w);
   time = world.now();
   console.log("p", p);

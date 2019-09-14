@@ -19,94 +19,17 @@ const randpos = function() {
   return new Rect(x, y, player_size, player_size)
 }
 
-class Rect {
-  constructor(x, y, w, h, c='#000') {
-    this.x = x;
-    this.y = y;
-    this.w = w;
-    this.h = h;
-    this.color = c;
-  }
-
-  hit(other) {
-    return (this.x + this.w >= other.x &&    // r1 right edge past r2 left
-            this.x <= other.x + other.w &&   // r1 left edge past r2 right
-            this.y + this.h >= other.y &&    // r1 top edge past r2 bottom
-            this.y <= other.y + other.h);
-  }
-}
-
-class Player extends Rect {
-  constructor(id, x, y) {
-    super(x, y, player_size, player_size, '#d60');
-    this.id = id;
-    this.energy = 100;
-    this.join_time = world.now();
-    this.dx = 0; this.dy = -1;
-  }
-}
-
-class Bullet extends Rect {
-  constructor (x, y, vx, vy, author='None', spawn_time, power) {
-    vx = Math.sign(vx);
-    vy = Math.sign(vy)
-    if (vx == 0) { // position bullet at centre point
-      super(x - 5, y - 15, 10, 30);
-    } else {
-      super(x - 15, y - 5, 30, 10);
-    }
-    this.vx = Bullet.speed * vx;
-    this.vy = Bullet.speed * vy;
-    this.x0 = this.x;
-    this.y0 = this.y;
-    this.author = author;
-    this.color = '#e22';
-    this.spawn_time = spawn_time;
-    this.prev_age = 0;
-    this.max_age = Bullet.max_age;
-    this.update();
-    this.id = `${this.author}:${this.spawn_time}`
-    this.power = power;
-  }
-  update() {
-    const new_age = world.now() - this.spawn_time;
-    let age = this.prev_age;
-    this.prev_age = new_age;
-
-    if (age >= this.max_age) {
-      this.remove();
-      return;
-    }
-    while (age < new_age) {
-      this.x = this.x0 + this.vx * age;
-      this.y = this.y0 + this.vy * age;
-      for (let wall of world.walls) {
-        if (this.hit(wall)) {
-          this.max_age = age;
-          return;
-        }
-      }
-      age += Bullet.MIN_DT
-    }
-  }
-  remove() {
-    world.bullets.splice(world.bullets.indexOf(this), 1);
-    log(4, 'Bullet removed!')
-  }
-}
-Bullet.MIN_DT = 10;
-Bullet.speed = 0.75;
-Bullet.max_age = world_size / Bullet.speed;
-
-
 class World {
   constructor() {
     this.players = [];
-    this.bullets = [];
     this.walls = [];
     this.start_time = Date.now();
+    this.age = 0;
+    this.generate_walls();
+    log(4, 'world constructed!')
+  }
 
-    // outside walls
+  generate_walls() {
     let c = 'hsl(225, 35%, 55%)';
     this.walls.push(
       new Rect(-world_radius - 10, -world_radius - 10, 10, world_size + 30, c),
@@ -114,8 +37,6 @@ class World {
       new Rect(-world_radius - 10, -world_radius - 10, world_size + 20, 10, c),
       new Rect(-world_radius, world_radius + 10, world_size + 20, 10, c)
     )
-
-    // random level walls
     const g = 200, s = 30;
     for (let x = -world_radius; x < world_radius; x += g) {
       for (let y =  -world_radius; y < world_radius; y += g) {
@@ -127,7 +48,6 @@ class World {
         this.walls.push(wall);
       }
     }
-    log(4, 'world constructed!')
   }
 
   now() { return Date.now() - this.start_time; }
@@ -171,6 +91,33 @@ class World {
     for (let player of this.players) {
       if (player.id == id) return player;
     }
+  }
+}
+
+class Rect {
+  constructor(x, y, w, h, c='#000') {
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.color = c;
+  }
+
+  hit(other) {
+    return (this.x + this.w >= other.x &&    // r1 right edge past r2 left
+            this.x <= other.x + other.w &&   // r1 left edge past r2 right
+            this.y + this.h >= other.y &&    // r1 top edge past r2 bottom
+            this.y <= other.y + other.h);
+  }
+}
+
+class Player extends Rect {
+  constructor(id, x, y) {
+    super(x, y, player_size, player_size, '#d60');
+    this.id = id;
+    this.energy = 100;
+    this.join_time = world.now();
+    this.dx = 0; this.dy = -1;
   }
 }
 
