@@ -1,5 +1,5 @@
 class Bullet extends Rect {
-  constructor (x, y, vx, vy, author) {
+  constructor (x, y, vx, vy, power, author) {
     if (vx != 0) {
       super(x, y, 30, 10);
     } else if (vy != 0) {
@@ -9,6 +9,7 @@ class Bullet extends Rect {
     this.vy = vy;
     this.x0 = this.x;
     this.y0 = this.y;
+    this.power = power;
     this.author = author;
     this.spawn_time = world.now();
     this.id = `${author}:${this.spawn_time}`;
@@ -16,7 +17,7 @@ class Bullet extends Rect {
     this.update();
   }
   static from_obj(o) {
-    const b = new Bullet(o.x0, o.y0, o.vx, o.vy, o.author);
+    const b = new Bullet(o.x0, o.y0, o.vx, o.vy, o.power, o.author);
     b.id = o.id;
     b.spawn_time = o.spawn_time;
     return b;

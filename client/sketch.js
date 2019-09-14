@@ -50,7 +50,7 @@ function on_server_welcome(p, w) {
   ready = true;
 }
 
-function on_server_update(player_update, new_bullets, bullet_hits) {
+function on_server_update(players, new_bullets, bullet_hits) {
   // update the players except if it's the player then use the player with the energy update
   world.players = players.map(o => (o.id == player.id) ? player.energy = o.energy, player : Player.from_obj(o));
   for (let b of new_bullets) {

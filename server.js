@@ -13,11 +13,6 @@ const constrain = (n, lo, hi) => Math.max(Math.min(n, hi), lo);
 const randarray = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const floor = Math.floor;
 const abs = Math.abs;
-const randpos = function() {
-  let x = rand(-world_radius, world_radius);
-  let y = rand(-world_radius, world_radius);
-  return new Rect(x, y, player_size, player_size)
-}
 
 class World {
   constructor() {
@@ -52,39 +47,31 @@ class World {
 
   now() { return Date.now() - this.start_time; }
 
-  newPlayer(socket) {
-    let pos, hit = true;
+  newPlayer(id) {
+    let p, hit = true;
     // spawn niet in muren
     while (hit) {
-      hit = false;
-      pos = randpos();
-      for (let wall of world.walls) {
-        if (wall.hit(pos)) hit = true;
-      }
+      p = new Player(id, world_radius * rand(-1, 1), world_radius * rand(-1, 1));
+      hit = world.walls.some(w => w.hit(p));
     }
-    let new_player = new Player(socket.id, pos.x, pos.y);
-    this.players.push(new_player);
-    return new_player;
+    this.players.push(p);
+    return p;
+  }
+
+  updatePlayer(pu) {
+    p = findPlayerById(pu.id);
+    p.x = pu.x;
+    p.y = pu.y;
+    p.energy = pu.energy;
+    p.username = pu.username;
+    p.dx = pu.dx;
+    p.dy = pu.dy;
   }
 
   removePlayer(id) {
     for (var i = this.players.length - 1; i >= 0; i--) {
-      if (this.players[i].id === id) this.players.splice(i, 1);
+      if (this.players[i].id == id) this.players.splice(i, 1);
     }
-  }
-
-  updatePlayer(id, p_new) {
-    try {
-      let p = this.findPlayerById(id);
-      p.x = p_new.x;
-      p.y = p_new.y;
-      p.energy = p_new.energy;
-      p.username = p_new.username;
-    } catch(error) {
-      log(1, `Update of ${id.substring(16, 20)} failed! Client input: ${p_new}`)
-      // kick?
-    }
-
   }
 
   findPlayerById(id) {
@@ -155,30 +142,29 @@ log(4, 'Starting server!')
 // Http server
 let express = require('express');
 let app = express();
-const listening = function() {log(1, 'Server listening at port ' + server.address().port);};
-let server = app.listen(argv.p, listening); // listen() if server started
-app.use(express.static('client'));
-
+let server = app.listen(argv.p, () => log(1, 'Server listening at port ' + server.address().port));
 
 // ========= BEGIN =========================================================
 
 let world = new World();
+let bullet_hits = [];
+let new_bullets = [];
 
 let io = require('socket.io')(server); // socket.io uses http server
 
 io.sockets.on('connection', socket => {
     let id = socket.id.substring(16, 20) // last 4 charaters are less nonsense
-    log(2, 'New client: ' + id);
+    log(3, 'New client: ' + id);
 
     socket.on('player_join', () => {
         log(2, id + ' joined the game');
-        let new_player = world.newPlayer(socket);
+        let new_player = world.newPlayer(socket.id);
         world.age = world.now();
         socket.emit('server_welcome', new_player, world);
     });
 
     socket.on('player_update', (p) => {
-      world.updatePlayer(socket.id, p);
+      world.updatePlayer(p);
     });
 
     socket.on('disconnect', () => {
@@ -186,19 +172,12 @@ io.sockets.on('connection', socket => {
       log(2, id + ' disconnected');
     });
 
-    socket.on('player_reset', () => {
-      log(3, 'Resetting ' + id)
-      world.removePlayer(socket.id);
-      world.newPlayer(socket);
-      socket.emit('start', world.findPlayerById(socket.id), world);
-    });
-
-    socket.on('bullet', (spawn_time, x, y, vx, vy, bullet_power) => {
+    socket.on('bullet_new', (b) => {
       log(4,'Recieved bullet emit from ' + id)
-      world.bullets.push(new Bullet(x, y, vx, vy, socket.id, spawn_time, bullet_power))
+      new_bullets.push(b);
     });
 
-    socket.on('bullet_hitplayer', (bid) => {
+    socket.on('bullet_hit', (bid) => {
       for (let b of world.bullets) {
         if (b.id == bid) {
           b.remove();
@@ -207,7 +186,6 @@ io.sockets.on('connection', socket => {
     });
 })
 
-// Nu updaten de bullets 100x per sec :D
 function heartbeat() {
   for (let bullet of world.bullets) {
     bullet.update();
