@@ -52,7 +52,7 @@ function on_server_welcome(p, w) {
 
 function on_server_update(players, new_bullets, bullet_hits) {
   // update the players except if it's the player then use the player with the energy update
-  world.players = players.map(o => (o.id == player.id) ? player.energy = o.energy, player : Player.from_obj(o));
+  world.players = players.map(o => (o.id == player.id) ? (player.energy = o.energy, player) : Player.from_obj(o));
   for (let b of new_bullets) {
     if (b.author != player.id) world.bullets.push(Bullet.from_obj(b));
   }
@@ -94,8 +94,11 @@ function draw() {
     if (p.hit(screen_rect)) (p.id == player.id ? player : p).show();
   }
   for (let i = world.bullets.length - 1; i >= 0; i--) {
-    world.bullets[i].update();
+    /* PROBLEEM: Bullet hit wall, wordt geremoved, kan dus niet meer showen
+       FIX: Omdraaien, maar dus wel 1 frame achter
+    */
     world.bullets[i].show();
+    world.bullets[i].update();
   }
   do_particles(dt);
   pop();
