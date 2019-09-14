@@ -8,7 +8,6 @@ const log = (level, text) => {
   //tijd?
 }
 
-
 const rand = (lo, hi) => lo + (hi - lo) * Math.random();
 const constrain = (n, lo, hi) => Math.max(Math.min(n, hi), lo);
 const randarray = (arr) => arr[Math.floor(Math.random() * arr.length)];
@@ -48,13 +47,13 @@ class Player extends Rect {
 }
 
 class Bullet extends Rect {
-  constructor (x, y, vx, vy, author='None', spawn_time, power) {    
+  constructor (x, y, vx, vy, author='None', spawn_time, power) {
     vx = Math.sign(vx);
     vy = Math.sign(vy)
     if (vx == 0) { // position bullet at centre point
       super(x - 5, y - 15, 10, 30);
     } else {
-      super(x - 15, y - 5, 30, 10); 
+      super(x - 15, y - 5, 30, 10);
     }
     this.vx = Bullet.speed * vx;
     this.vy = Bullet.speed * vy;

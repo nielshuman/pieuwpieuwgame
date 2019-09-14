@@ -5,55 +5,52 @@ class Bullet extends Rect {
     } else if (vy != 0) {
       super(x, y, 10, 30);
     }
-    this.author = author;
-    this.color = '#e2b';
-    this.color2 = lerpColor(color(this.color), color("#fff"), 0.5)
-    this.color3 = lerpColor(color(this.color), color("#000f"), 0.5)
     this.vx = vx;
     this.vy = vy;
-    this.max_age = Bullet.max_age;
+    this.x0 = this.x;
+    this.y0 = this.y;
+    this.author = author;
+    this.spawn_time = world.now();
+    this.id = `${author}:${this.spawn_time}`;
+    this.color = '#e2b';
+    this.update();
   }
   static from_obj(o) {
-    const b = new Bullet(o.x, o.y, o.vx, o.vy, o.author);
-    b.x0 = o.x0;
-    b.y0 = o.y0;
+    const b = new Bullet(o.x0, o.y0, o.vx, o.vy, o.author);
     b.id = o.id;
     b.spawn_time = o.spawn_time;
-    b.max_age = o.max_age;
-    b.color = o.color;
     return b;
   }
   update() {
     const age = world.now() - this.spawn_time;
-    if (age >= this.max_age) { // if old
+    if (age >= Bullet.max_age) { // if old
         this.remove();
-        this.explode();
         return;
     }
     this.x = this.x0 + this.vx * age;
     this.y = this.y0 + this.vy * age;
     for (let wall of world.walls) { // if hit wall
       if (this.hit(wall)) {
-        this.remove();
-        this.explode();
+        this.hit_obj(wall);
         return;
       }
     }
     for (let p of world.players) { // if hit a player
-      if (this.hit(p) && p.id != player.id) {
-        hitSound.play();
-        this.explode();
-        this.remove();
+      if (this.hit(p)) {
+        this.hit_obj(p);
+        return;
       }
     }
-    if (this.hit(player) && this.author != player.id) { // if hit this player
-      console.log('DOOD!');
-      socket.emit('bullet_hitplayer', this.id);
-      player.takeDamage(this.power);
+  }
+  hit_obj(target) {
+    if (target instanceof Player) {
       hitSound.play();
-      this.explode();
-      this.remove();
+    } else {
+      wallHitSound.play();
     }
+    this.explode();
+    this.remove();
+    if (this.author == player.id) socket.emit('bullet_hit', this.id, target);
   }
   remove() {
     world.bullets.splice(world.bullets.indexOf(this), 1);
@@ -67,7 +64,7 @@ class Bullet extends Rect {
     noStroke();
     fill(this.color);
     rect(this.x, this.y, this.w, this.h, 5, 5);
-    fill(this.color2);
+    fill("#fff");
     rect(this.x + 3, this.y + 3, this.w - 6, this.h - 6, 5, 5);
     // particle_fx(this.mx, this.my, 50, 1, random([this.color, "#fff"]));
   }

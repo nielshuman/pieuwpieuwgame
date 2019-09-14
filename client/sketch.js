@@ -1,12 +1,12 @@
 p5.disableFriendlyErrors = true; // disables FES
 const names = ["pluisje", "vlekje", "kruimel", "poekie", "fluffie", "muffin",
-"diesel", "spike", "simba", "lucky", "spoekie", "tijger", "snuf", "pien",
+"diesel", "spike", "simba", "lucky", "spoekie", "tijger", "snuf",
 "woezel", "pip", "puck", "nugget"];
 const post_names = ["the destroyer", "the great", "the fool", "the conqueror",
 "of death", "doom", "the insane", "the indestructable", "the wicked",
 "the brutal", "frost", "the foul", "the pirate"];
 const pre_names = ["super", "mad ", "mega", "ultra", "hyper", "power", "giga",
-"insane ", "bad ", "zombie ", "ghost ", "robot ", "ninja ", "pirate ",
+"insane ", "bad ", "zombie ", "robot ", "ninja ", "pirate ",
 "screaming ", "angry ", "happy ", "danger "];
 
 let username_box;
@@ -46,17 +46,23 @@ function on_server_welcome(p, w) {
   player.hit_list = world.walls;
   player.color = p.color;
   ready = true;
-  // select('#loading').remove()
-  // hbar = new Bar(width -220, height - 50, 200, 30);
 }
 
-function on_server_update(players, bullets) {
-  world.players = players.map(Player.from_obj);
-  world.bullets = bullets.map(Bullet.from_obj);
-  socket.emit('player_update', player);
+function on_server_update(player_update, new_bullets, bullet_hits) {
+  // update the players except if it's the player then use the player with the energy update
+  world.players = players.map(o => (o.id == player.id) ? player.energy = o.energy, player : Player.from_obj(o));
+  for (let b of new_bullets) {
+    if (b.author != player.id) world.bullets.push(Bullet.from_obj(b));
+  }
+  for (let bh of bullet_hits) {
+    for (let i = world.bullets.length - 1; i >= 0; i--) {
+      if (world.bullets[i].id == bh.id) world.bullets[i].hit_obj(bh.target);
+    }
+  }
 }
 
 let screenshake = 0, screen_shake_size = 4;
+let next_update_time = 0;
 function draw() {
   background("#123");
   if (!ready) {return};
@@ -85,12 +91,17 @@ function draw() {
   for (let p of world.players) {
     if (p.hit(screen_rect)) (p.id == player.id ? player : p).show();
   }
-  for (let b of world.bullets) {
-    b.update();
-    b.show();
+  for (let i = world.bullets.length - 1; i >= 0; i--) {
+    world.bullets[i].update();
+    world.bullets[i].show();
   }
   do_particles(dt);
   pop();
+
+  if (time > next_update_time) {
+    socket.emit('player_update', player);
+    next_update_time = time + 100; // upadet every 100ms
+  }
 
   if (frameCount % 20 == 0) fps = frameRate();
   fill(255);
@@ -110,15 +121,17 @@ function keyPressed() {
       masterVolume(0);
       console.log('Muted');
     }
-  } else if (key == ' ' || key == 'b') {
+  } else if (key == ' ' || key == 'j') {
     let dx = player.dx, dy = player.dy;
     let x = player.mx + dx * player.w / 2;
     let y = player.my + dy * player.h / 2;
     const bullet_cost = (key == ' ') ? 4 : 0; // 'b' is cheat free bullet
     if (player.energy > bullet_cost) {
       player.energy -= bullet_cost;
-      let bullet_power = 17 - 0.1 * player.energy + random(-3, 3);
-      socket.emit('bullet', world.now(), x, y, dx, dy, bullet_power);
+      let bullet_power = 17 - 0.1 * player.energy;
+      let b = new Bullet(x, y, dx, dy, player.id);
+      socket.emit('bullet_new', b);
+      world.bullets.push(b);
       shootSound.play();
       fx_shoot(x, y, dx, dy);
     }
