@@ -163,7 +163,7 @@ io.sockets.on('connection', socket => {
         socket.emit('server_welcome', new_player, world);
     });
 
-    socket.on('player_update', (p) => {
+    socket.on('player_update', p => {
       world.updatePlayer(p);
     });
 
@@ -172,17 +172,15 @@ io.sockets.on('connection', socket => {
       log(2, id + ' disconnected');
     });
 
-    socket.on('bullet_new', (b) => {
+    socket.on('bullet_new', b => {
       log(4,'Recieved bullet emit from ' + id)
       new_bullets.push(b);
     });
 
-    socket.on('bullet_hit', (bid) => {
-      for (let b of world.bullets) {
-        if (b.id == bid) {
-          b.remove();
-        }
-      }
+    socket.on('bullet_hit', (b, target) => {
+      bullet_hits.push({id: b.id, target: target});
+      // if target is Player, do damage
+      if (target.energy)
     });
 })
 

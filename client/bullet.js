@@ -51,7 +51,7 @@ class Bullet extends Rect {
     }
     this.explode();
     this.remove();
-    if (this.author == player.id) socket.emit('bullet_hit', this.id, target);
+    if (this.author == player.id) socket.emit('bullet_hit', this, target);
   }
   remove() {
     world.bullets.splice(world.bullets.indexOf(this), 1);
