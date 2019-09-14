@@ -56,7 +56,7 @@ function on_server_update(players, bullets) {
   socket.emit('player_update', player);
 }
 
-let screenshake = 0;
+let screenshake = 0, screen_shake_size = 4;
 function draw() {
   background("#123");
   if (!ready) {return};
@@ -77,7 +77,7 @@ function draw() {
   screen_rect = new Rect(player.mx - W2, player.my - H2, W, H);
   if (screenshake > 0) {
     screenshake--;
-    translate(random(-8, 8), random(-8, 8));
+    translate(random(-1, 1) * screen_shake_size, random(-1, 1) * screen_shake_size);
   }
   for (let wall of world.walls) {
     if (wall.hit(screen_rect)) wall.show();

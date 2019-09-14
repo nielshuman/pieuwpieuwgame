@@ -9,14 +9,21 @@ function particle_fx(N, x0, y0, c, t=100, j=0.1, dx=0, dy=0, r=0.02) {
 }
 
 function fx_explosion(x0, y0) {
+  particle_fx(20, x0, y0, "#000", 80);
+  particle_fx(20, x0, y0, "#f00", 60);
+  particle_fx(20, x0, y0, "#f0f", 45);
+  particle_fx(20, x0, y0, "#fff", 30);
+}
+
+function fx_big_explosion(x0, y0) {
   particle_fx(20, x0, y0, "#000", 120);
   particle_fx(20, x0, y0, "#f00", 80);
   particle_fx(20, x0, y0, "#f0f", 60);
-  particle_fx(20, x0, y0, "#fff", 40);  
+  particle_fx(20, x0, y0, "#fff", 40);
 }
 
 function fx_shoot(x, y, dx, dy) {
-  particle_fx(5, x, y, "#fff", 30, 0.1, dx * 0.2, dy * 0.2);  
+  particle_fx(5, x, y, "#fff", 30, 0.1, dx * 0.2, dy * 0.2);
 }
 
 // call every frame

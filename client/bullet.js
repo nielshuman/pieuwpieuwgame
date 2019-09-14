@@ -28,7 +28,7 @@ class Bullet extends Rect {
     if (age >= this.max_age) { // if old
         this.remove();
         this.explode();
-        return;      
+        return;
     }
     this.x = this.x0 + this.vx * age;
     this.y = this.y0 + this.vy * age;
@@ -61,7 +61,7 @@ class Bullet extends Rect {
   explode() {
     const mx = this.mx, my = this.my;
     fx_explosion(mx, my);
-    if (this.hit(screen_rect)) screenshake = 3;
+    if (this.hit(screen_rect)) screenshake = 2;
   }
   show() {
     noStroke();
