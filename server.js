@@ -3,11 +3,7 @@ let world_radius = 1000;
 let world_size = world_radius * 2
 let log_level = 3;
 
-const log = (level, text) => {
-  if (level <= log_level) console.log(`[${level}] ${text}`);
-  //tijd?
-}
-
+const log = (level, text) => {if (level <= log_level) console.log(`[${level}] ${text}`);}
 const rand = (lo, hi) => lo + (hi - lo) * Math.random();
 const constrain = (n, lo, hi) => Math.max(Math.min(n, hi), lo);
 const randarray = (arr) => arr[Math.floor(Math.random() * arr.length)];
@@ -59,7 +55,7 @@ class World {
   }
 
   updatePlayer(pu) {
-    p = findPlayerById(pu.id);
+    let p = world.findPlayerById(pu.id);
     p.x = pu.x;
     p.y = pu.y;
     p.energy = pu.energy;
@@ -139,18 +135,18 @@ world_size = world_radius * 2
 log(4, 'log_level = ' + log_level)
 log(4, 'world_radius = ' + world_radius)
 log(4, 'Starting server!')
+
 // Http server
 let express = require('express');
 let app = express();
 let server = app.listen(argv.p, () => log(1, 'Server listening at port ' + server.address().port));
+app.use(express.static('client'));
+let io = require('socket.io')(server); // socket.io uses http server
 
 // ========= BEGIN =========================================================
-
 let world = new World();
 let bullet_hits = [];
 let new_bullets = [];
-
-let io = require('socket.io')(server); // socket.io uses http server
 
 io.sockets.on('connection', socket => {
     let id = socket.id.substring(16, 20) // last 4 charaters are less nonsense
@@ -179,18 +175,15 @@ io.sockets.on('connection', socket => {
 
     socket.on('bullet_hit', (b, target) => {
       bullet_hits.push({id: b.id, target: target});
-      // if target is Player, do damage
-      if (target.energy)
+      if (target.energy > 0) {     //undefined > 0 == false
+        target.energy -= b.power;
+      }
     });
 })
 
 function heartbeat() {
-  for (let bullet of world.bullets) {
-    bullet.update();
-  }
-  for (let player of world.players) { // only 'ready clients' update
-    io.to(player.id).emit('server_update', world.players, world.bullets);
-  }
+  io.sockets.emit('server_update', world.players, bullet_hits, new_bullets);
+  bullet_hits = new_bullets = [];
 }
 
 setInterval(heartbeat, argv.i);
