@@ -6,6 +6,7 @@
 - extra snelheid
 - invisible (moet wel erg zeldzaam zijn denk ik)
 - sneller healen
+- dat je breedte halveert of verdubbelt, en de hoogte ook, met 50% kans beide0
 
 ### 1 actie items:
 - heath weer naar 100
