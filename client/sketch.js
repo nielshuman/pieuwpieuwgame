@@ -31,10 +31,15 @@ function setup() {
   socket = io();
   socket.on('server_update', on_server_update);
   socket.on('server_welcome', on_server_welcome);
+  socket.on('damage', on_damage);
   socket.emit('player_join');
   username_box = select("#username");
   username_box.value((random() < 0.5) ? random(names) + ' ' + random(post_names) : random(pre_names) + random(names));
   masterVolume(0);
+}
+
+function on_damage(amount) {
+  player.energy = max(0, player.energy - amount);
 }
 
 function on_server_welcome(p, w) {
@@ -51,14 +56,19 @@ function on_server_welcome(p, w) {
 }
 
 function on_server_update(players, new_bullets, bullet_hits) {
+  if (!ready) return;
   // update the players except if it's the player then use the player with the energy update
-  world.players = players.map(o => (o.id == player.id) ? (player.energy = o.energy, player) : Player.from_obj(o));
+  world.players = players.map(o => (o.id == player.id) ? player : Player.from_obj(o));
   for (let b of new_bullets) {
     if (b.author != player.id) world.bullets.push(Bullet.from_obj(b));
   }
   for (let bh of bullet_hits) {
+    let b = bh.b, target = bh.target;
     for (let i = world.bullets.length - 1; i >= 0; i--) {
-      if (world.bullets[i].id == bh.id) world.bullets[i].hit_obj(bh.target);
+      if (world.bullets[i].id == b.id && b.author != player.id) {
+        console.log("bullet_hit_event", bullet_hits);
+        world.bullets[i].hit_obj(target);
+      }
     }
   }
 }
@@ -66,7 +76,7 @@ function on_server_update(players, new_bullets, bullet_hits) {
 let screenshake = 0, screen_shake_size = 4;
 let next_update_time = 0;
 function draw() {
-  background("#123");
+  background(player && player.energy <= 0 ? "#311" : "#123");
   if (!ready) {return};
 
   let prev_time = time;
@@ -134,7 +144,7 @@ function keyPressed() {
     if (player.energy > bullet_cost) {
       player.energy -= bullet_cost;
       let bullet_power = 17 - 0.1 * player.energy;
-      let b = new Bullet(x, y, dx, dy, player.id);
+      let b = new Bullet(x, y, dx, dy, bullet_power, player.id);
       socket.emit('bullet_new', b);
       world.bullets.push(b);
       shootSound.play();

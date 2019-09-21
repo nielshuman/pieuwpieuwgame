@@ -3,7 +3,7 @@ let world_radius = 1000;
 let world_size = world_radius * 2
 let log_level = 3;
 
-const log = (level, text) => {if (level <= log_level) console.log(`[${level}] ${text}`);}
+const log = (level, ...text) => { if (level <= log_level) console.log(`[${level}]`, ...text); }
 const rand = (lo, hi) => lo + (hi - lo) * Math.random();
 const constrain = (n, lo, hi) => Math.max(Math.min(n, hi), lo);
 const randarray = (arr) => arr[Math.floor(Math.random() * arr.length)];
@@ -56,6 +56,7 @@ class World {
 
   updatePlayer(pu) {
     let p = world.findPlayerById(pu.id);
+    if (!p) return;
     p.x = pu.x;
     p.y = pu.y;
     p.energy = pu.energy;
@@ -174,16 +175,18 @@ io.sockets.on('connection', socket => {
     });
 
     socket.on('bullet_hit', (b, target) => {
-      bullet_hits.push({id: b.id, target: target});
-      if (target.energy > 0) {     //undefined > 0 == false
-        target.energy -= b.power;
-      }
+      bullet_hits.push({b: b, target: target});
+      log(4, "bullet_hit " + b.id + ' ' + target);
+      io.to(target.id).emit('damage', b.power);
     });
 })
 
 function heartbeat() {
-  io.sockets.emit('server_update', world.players, bullet_hits, new_bullets);
-  bullet_hits = new_bullets = [];
+  for (let player of world.players) { // only 'ready clients' update
+    io.to(player.id).emit('server_update', world.players, new_bullets, bullet_hits);
+  }
+  bullet_hits = [];
+  new_bullets = [];
 }
 
 setInterval(heartbeat, argv.i);

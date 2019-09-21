@@ -32,18 +32,21 @@ class Bullet extends Rect {
     this.y = this.y0 + this.vy * age;
     for (let wall of world.walls) { // if hit wall
       if (this.hit(wall)) {
+        console.log("hit wall");
         this.hit_obj(wall);
         return;
       }
     }
     for (let p of world.players) { // if hit a player
-      if (this.hit(p)) {
+      if (this.hit(p) && this.author != p.id && p.energy > 0) {
+        console.log("hit player", this.author, p.id, player.id);
         this.hit_obj(p);
         return;
       }
     }
   }
   hit_obj(target) {
+    console.log("hit_obj", target);
     if (target instanceof Player) {
       hitSound.play();
     } else {
