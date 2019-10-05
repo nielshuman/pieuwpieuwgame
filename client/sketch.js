@@ -23,11 +23,13 @@ function preload() {
   font = loadFont('assets/gamer.ttf');
 }
 
+let canvas;
+let zoom = 1, vertical_view = 960;
 function setup() {
   // frameRate(30);
-  let canvas = createCanvas(windowWidth, windowHeight);
+  canvas = createCanvas(windowWidth, windowHeight);
+  zoom = windowHeight / vertical_view;
   canvas.parent('#game_canvas')
-  W = width; H = height; W2 = W / 2; H2 = H / 2;
   socket = io();
   socket.on('server_update', on_server_update);
   socket.on('server_welcome', on_server_welcome);
@@ -91,8 +93,9 @@ function draw() {
 
   // rendering world
   push();
-  translate(W2 - player.mx, H2 - player.my);
-  screen_rect = new Rect(player.mx - W2, player.my - H2, W, H);
+  scale(zoom);
+  translate(width / 2 / zoom - player.mx, height / 2 / zoom - player.my);
+  screen_rect = new Rect(player.mx - width / 2 / zoom, player.my - height / 2 / zoom, width / zoom, height / zoom);
   if (screenshake > 0) {
     screenshake--;
     translate(random(-1, 1) * screen_shake_size, random(-1, 1) * screen_shake_size);
@@ -153,4 +156,9 @@ function keyPressed() {
   } else if (key == 'x') {
       player.energy = max(0, player.energy - random(10,30));
   }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  zoom = windowHeight / vertical_view;
 }
