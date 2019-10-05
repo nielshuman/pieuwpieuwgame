@@ -1,9 +1,9 @@
 class Bullet extends Rect {
-  constructor (x, y, vx, vy, power, author) {
+  constructor (cx, cy, vx, vy, power, author) {
     if (vx != 0) {
-      super(x, y, 30, 10);
+      super(cx - 15, cy - 5, 30, 10);
     } else if (vy != 0) {
-      super(x, y, 10, 30);
+      super(cx - 5, cy - 10, 10, 30);
     }
     this.vx = vx;
     this.vy = vy;
