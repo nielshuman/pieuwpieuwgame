@@ -13,6 +13,7 @@ let username_box;
 let walls = [], player, ready, world, socket;
 let W, H, W2, H2, fps = 0, screen_rect;
 let time;
+let bar;
 
 let shootSound, hitSound, wallHitSound, font;
 function preload() {
@@ -38,6 +39,7 @@ function setup() {
   username_box = select("#username");
   username_box.value((random() < 0.5) ? random(names) + ' ' + random(post_names) : random(pre_names) + random(names));
   masterVolume(0);
+  bar = new Bar(20, 20, 80, 20);
 }
 
 function on_damage(amount) {
@@ -86,10 +88,10 @@ function draw() {
   dt = time - prev_time;
   // controls and movement
   let speed = 0.42 * dt;
-  if (keyIsDown(87) || keyIsDown(UP_ARROW)) { player.move(0, -speed); }
-  if (keyIsDown(83) || keyIsDown(DOWN_ARROW)) { player.move(0, speed); }
-  if (keyIsDown(65) || keyIsDown(LEFT_ARROW)) { player.move(-speed, 0); }
-  if (keyIsDown(68) || keyIsDown(RIGHT_ARROW)) { player.move(speed, 0); }
+  if (keyIsDown(87 /*W*/) || keyIsDown(UP_ARROW))    player.move(0, -speed); 
+  if (keyIsDown(83 /*S*/) || keyIsDown(DOWN_ARROW))  player.move(0, speed);
+  if (keyIsDown(65 /*A*/) || keyIsDown(LEFT_ARROW))  player.move(-speed, 0);
+  if (keyIsDown(68 /*D*/) || keyIsDown(RIGHT_ARROW)) player.move(speed, 0);
 
   // rendering world
   push();
@@ -115,6 +117,8 @@ function draw() {
   }
   do_particles(dt);
   pop();
+
+  bar.show()
 
   if (time > next_update_time) {
     socket.emit('player_update', player);
