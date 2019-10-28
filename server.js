@@ -54,6 +54,16 @@ class World {
     return p;
   }
 
+  newItem() {
+    let p;
+    while (true) {
+      i = new Rect(world_radius * rand(-1, 1), world_radius * rand(-1, 1));
+      if (!world.walls.some(w => w.hit(i)) && !world.players.some(p => p.hit(i))) break;
+    }
+    i.type = choose(['size']);
+    return i;
+  }
+
   updatePlayer(pu) {
     let p = world.findPlayerById(pu.id);
     if (!p) return;
@@ -132,6 +142,8 @@ let io = require('socket.io')(server); // socket.io uses http server
 let world = new World();
 let bullet_hits = [];
 let new_bullets = [];
+let new_items = [];
+let used_items = [];
 
 io.sockets.on('connection', socket => {
     let id = socket.id.substring(16, 20) // last 4 charaters are less nonsense
@@ -163,13 +175,17 @@ io.sockets.on('connection', socket => {
       log(4, "bullet_hit " + b.id + ' ' + target);
       io.to(target.id).emit('damage', b.power);
     });
+
+    socket.on('item_used', item => {
+      used_items.push(item.id);
+    });
 })
 
 function heartbeat() {
   for (let player of world.players) { // only 'ready clients' update
-    io.to(player.id).emit('server_update', world.players, new_bullets, bullet_hits);
+    io.to(player.id).emit('server_update', world.players, new_bullets, bullet_hits, new_items, used_items);
   }
-  leegarr(bullet_hits, new_bullets)
+  leegarr(bullet_hits, new_bullets, new_items, used_items)
 }
 
 setInterval(heartbeat, flags.i);

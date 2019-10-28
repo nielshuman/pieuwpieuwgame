@@ -13,7 +13,7 @@ let username_box;
 let walls = [], player, ready, world, socket;
 let W, H, W2, H2, fps = 0, screen_rect;
 let time;
-let bar;
+
 
 let shootSound, hitSound, wallHitSound, font;
 function preload() {
@@ -39,7 +39,6 @@ function setup() {
   username_box = select("#username");
   username_box.value((random() < 0.5) ? random(names) + ' ' + random(post_names) : random(pre_names) + random(names));
   masterVolume(0);
-  bar = new Bar(20, 20, 80, 20);
 }
 
 function on_damage(amount) {
@@ -115,10 +114,11 @@ function draw() {
     world.bullets[i].show();
     world.bullets[i].update();
   }
+  
   do_particles(dt);
-  pop();
 
-  bar.show()
+  new Item(20, 20, 'size', '#66FF66').show();
+  pop();
 
   if (time > next_update_time) {
     socket.emit('player_update', player);

@@ -4,6 +4,7 @@ class Player extends SolidRect {
     this.energy = e;
     this.id = id;
   }
+
   static from_obj(o) {
     const p = new Player(o.x, o.y, o.w, o.h, o.color, o.energy, o.id);
     p.join_time = o.join_time;
@@ -12,6 +13,7 @@ class Player extends SolidRect {
     p.dy = o.dy;
     return p;
   }
+
   move(dx, dy) {
     super.move(dx, dy);
     this.dx = Math.sign(dx);
@@ -48,5 +50,15 @@ class Player extends SolidRect {
     fill(this.energy > 0 ? "#fffa" : "#fff6"); stroke("#0008"); strokeWeight(1.0);
     text(this.username, 0, h2 + 36);
     pop();
+  }
+
+  useItem(item) {
+    let t = item.type;
+    if (t == 'size') {
+      player.w *= random([1, 1, 0.5, 2]);
+      player.h *= random([1, 1, 0.5, 2]);
+    }
+    // stuur naar server dat item weg
+    // item.destroy() ofzo
   }
 }
