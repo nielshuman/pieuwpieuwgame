@@ -6,9 +6,10 @@ let log_level = 3;
 const log = (level, ...text) => { if (level <= log_level) console.log(`[${level}]`, ...text); }
 const rand = (lo, hi) => lo + (hi - lo) * Math.random();
 const constrain = (n, lo, hi) => Math.max(Math.min(n, hi), lo);
-const randarray = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const choose = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const floor = Math.floor;
 const abs = Math.abs;
+const leegarr = (...arr) => {for (let a of arr) a.splice(0, a.length)}
 
 class World {
   constructor() {
@@ -32,8 +33,8 @@ class World {
     for (let x = -world_radius; x < world_radius; x += g) {
       for (let y =  -world_radius; y < world_radius; y += g) {
         if (Math.random() < 0.5) continue;
-        let w = randarray([s, g + s]);
-        let h = randarray([s, g + s]);
+        let w = choose([s, g + s]);
+        let h = choose([s, g + s]);
         let wall = new Rect(x, y, w, h);
         wall.color = `hsl(${floor(225 + rand(-30, 30))}, 35%, ${rand(45, 65)}%)`;
         this.walls.push(wall);
@@ -44,11 +45,10 @@ class World {
   now() { return Date.now() - this.start_time; }
 
   newPlayer(id) {
-    let p, hit = true;
-    // spawn niet in muren
-    while (hit) {
+    let p;
+    while (true) {
       p = new Player(id, world_radius * rand(-1, 1), world_radius * rand(-1, 1));
-      hit = world.walls.some(w => w.hit(p));
+      if (!world.walls.some(w => w.hit(p))) break;
     }
     this.players.push(p);
     return p;
@@ -72,9 +72,7 @@ class World {
   }
 
   findPlayerById(id) {
-    for (let player of this.players) {
-      if (player.id == id) return player;
-    }
+    for (let player of this.players) {if (player.id == id) return player;}
   }
 }
 
@@ -106,45 +104,31 @@ class Player extends Rect {
 }
 
 // command line arguments
-var argv = require('yargs')
-    .option('port', {
-      alias: 'p',
-      default: 3000,
-      describe: 'port to bind on'
-    })
-    .option('interval', {
-      alias: 'i',
-      default: 100, // 10 Hz
-      describe: 'Interval in miliseconds of sending data'
-    })
-    .option('log_level', {
-      alias: 'l',
-      default: log_level,
-      describe: 'Amount of log, 4=everything, 3=normal, 2=only join/error/system, 1=only error/system'
-    })
-    .option('world_radius', {
-      default: world_radius,
-      describe: 'Size of world'
-    })
+var flags = require('yargs')
+    .option('port', {alias: 'p', default: 3000, describe: 'port to bind on'})
+    .option('interval', {alias: 'i', default: 100, describe: 'Interval in miliseconds of sending data'})
+    .option('log_level', {alias: 'l', default: log_level, describe: 'Amount of log, 4=everything, 3=normal, 2=only join/error/system, 1=only error/system'})
+    .option('world_radius', {default: world_radius, describe: 'Size of world'})
     .help()
     .argv;
 
-log_level = argv.l; // 4=everything, 3=normal, 2=only join/error/system,  1=only error/system
-world_radius = argv.world_radius;
-world_size = world_radius * 2
+log_level = flags.l; // 4=everything, 3=normal, 2=only join/error/system,  1=only error/system
+world_radius = flags.world_radius;
+world_size = world_radius * 2;
 
-log(4, 'log_level = ' + log_level)
-log(4, 'world_radius = ' + world_radius)
-log(4, 'Starting server!')
+log(4, 'log_level = ' + log_level);
+log(4, 'world_radius = ' + world_radius);
+log(4, 'Starting server!');
 
 // Http server
 let express = require('express');
 let app = express();
-let server = app.listen(argv.p, () => log(1, 'Server listening at port ' + server.address().port));
+let server = app.listen(flags.p, () => log(1, 'Server listening at port ' + server.address().port));
 app.use(express.static('client'));
 let io = require('socket.io')(server); // socket.io uses http server
 
 // ========= BEGIN =========================================================
+
 let world = new World();
 let bullet_hits = [];
 let new_bullets = [];
@@ -185,8 +169,7 @@ function heartbeat() {
   for (let player of world.players) { // only 'ready clients' update
     io.to(player.id).emit('server_update', world.players, new_bullets, bullet_hits);
   }
-  bullet_hits = [];
-  new_bullets = [];
+  leegarr(bullet_hits, new_bullets)
 }
 
-setInterval(heartbeat, argv.i);
+setInterval(heartbeat, flags.i);
