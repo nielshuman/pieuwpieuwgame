@@ -9,7 +9,7 @@ Coole game dinges met [p5.js](https://p5js.org/), [socket.io](http://socket.io/)
 ## opties/voorbeeld dingetjes
 Command: `node server`
 | Flag                | Beschrijving                                                                         | Default |
-|---------------------|--------------------------------------------------------------------------------------|---------|
+| ------------------- | ------------------------------------------------------------------------------------ | ------- |
 | `--help`            | Doet help                                                                            | false   |
 | `-p`, `--port`      | De poort voor de game                                                                | 3000    |
 | `-i`, `--interval`  | Interval in miliseconds of sending data (AAAaaaAAa tegenwoordig pls niet aanpassen)  | 100     |
