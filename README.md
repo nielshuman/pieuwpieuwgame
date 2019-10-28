@@ -16,8 +16,3 @@ Command: `node server`
 | `-i`, `--interval`  | Interval in miliseconds of sending data (AAAaaaAAa tegenwoordig pls niet aanpassen)  | 100     |
 | `-l`, `--log_level` | Amount of log, 4=everything, 3=normal, 2=only join/error/system, 1=only error/system | 3       |
 | `--world-radius`    | Hoe groot wereld                                                                     | 1000    |
-
-| Command | Description |
-| --- | --- |
-| `git status` | List all *new or modified* files |
-| `git diff` | Show file differences that **haven't been** staged |
