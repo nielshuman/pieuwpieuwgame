@@ -57,7 +57,7 @@ function on_server_welcome(p, w) {
   player.color = p.color;
   ready = true;
 
-  let item = new Item(20, 20, 'size', '#66FF66'); // test item
+  let item = new Item(20, 20, 'speed', '#66FF66'); // test item
   world.items = [item];
 
 
@@ -117,11 +117,11 @@ function draw() {
     /* PROBLEEM: Bullet hit wall, wordt geremoved, kan dus niet meer showen
        FIX: Omdraaien, maar dus wel 1 frame achter
     */
-    if i.hit(screen_rect) world.bullets[i].show();
+    if (world.bullets[i].hit(screen_rect)) world.bullets[i].show();
     world.bullets[i].update();
   }
   for (let i of world.items) {
-    if i.hit(screen_rect) i.show();
+    if (i.hit(screen_rect)) i.show();
     if (player.hit(i)){
       player.useItem(i);
       i.remove();
@@ -138,11 +138,14 @@ function draw() {
     next_update_time = time + 100; // upadet every 100ms
   }
 
+  if (player.itemExparationTime != -1 && player.itemExparationTime < time) player.clearEffects();
+
   if (frameCount % 20 == 0) fps = frameRate();
   fill(255);
   stroke(0);
   text(`FPS: ${fps.toFixed(2)}`, 10, height - 10);
   text(`NOW: ${world.now()}`, 10, height - 30);
+  text(`IET: ${player.itemExparationTime}`, 10, height - 50)
   player.username = username_box.value().substring(0, 26).toUpperCase();
   if (player.energy > 0) player.energy = min(100, player.energy + 3 * dt / 1000);
 }

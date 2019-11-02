@@ -3,6 +3,9 @@ class Player extends SolidRect {
     super(x, y, w, h, c, hit_list);
     this.energy = e;
     this.id = id;
+    this.speed = 1;
+    this.standard_size = w;
+    this.itemExparationTime = -1;
   }
 
   static from_obj(o) {
@@ -15,7 +18,7 @@ class Player extends SolidRect {
   }
 
   move(dx, dy) {
-    super.move(dx, dy);
+    super.move(dx*this.speed, dy*this.speed);
     this.dx = Math.sign(dx);
     this.dy = Math.sign(dy);
   }
@@ -58,6 +61,16 @@ class Player extends SolidRect {
       player.w *= random([1, 0.5, 2]);
       player.h *= random([1, 0.5, 2]);
     }
+    if (t == 'speed') {
+      this.speed *= 1.5;
+    }
     this.itemExparationTime = world.now() + item.duration;
+  }
+
+  clearEffects() {
+    this.w = this.standard_size;
+    this.h = this.standard_size;
+    this.speed = 1;
+    this.itemExparationTime = -1;
   }
 }
