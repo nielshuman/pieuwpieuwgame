@@ -137,6 +137,10 @@ let server = app.listen(flags.p, () => log(1, 'Server listening at port ' + serv
 app.use(express.static('client'));
 let io = require('socket.io')(server); // socket.io uses http server
 
+const readline = require('readline').createInterface({
+  input: process.stdin,
+  output: process.stdout
+})
 // ========= BEGIN =========================================================
 
 let world = new World();
@@ -188,4 +192,15 @@ function heartbeat() {
   leegarr(bullet_hits, new_bullets, new_items, used_items)
 }
 
+const myRL = require("serverline")
+myRL.setCompletion(['world', 'world.bullets', 'world.players', 'world.bullets', 'world.players'])
+myRL.init()
+myRL.setPrompt('> ')
+myRL.on('line', function(line) {
+  try {
+    console.log(eval(line))
+  } catch (e) {
+    console.error(e)
+  }
+})
 setInterval(heartbeat, flags.i);
