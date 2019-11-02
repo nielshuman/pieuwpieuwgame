@@ -56,6 +56,11 @@ function on_server_welcome(p, w) {
   player.hit_list = world.walls;
   player.color = p.color;
   ready = true;
+
+  let item = new Item(20, 20, 'size', '#66FF66'); // test item
+  world.items = [item];
+
+
 }
 
 function on_server_update(players, new_bullets, bullet_hits) {
@@ -114,10 +119,12 @@ function draw() {
     world.bullets[i].show();
     world.bullets[i].update();
   }
+  for (let i of world.items) {
+    i.show();
+  }
   
   do_particles(dt);
 
-  new Item(20, 20, 'size', '#66FF66').show();
   pop();
 
   if (time > next_update_time) {
