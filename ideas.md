@@ -19,3 +19,4 @@ spelers ietsjes langzamer bewegen?
 
 screenshake harder als de explosie dichtbij is, zachter als explosie ver weg is. (geluiden ook!!!)
 
+chat/berichten dingetje met '**Puisje doom** killed **Woezel the Great**'

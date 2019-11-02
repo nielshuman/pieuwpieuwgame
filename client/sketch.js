@@ -83,6 +83,7 @@ function on_server_update(players, new_bullets, bullet_hits) {
 
 let screenshake = 0, screen_shake_size = 4;
 let next_update_time = 0;
+
 function draw() {
   background(player && player.energy <= 0 ? "#311" : "#123");
   if (!ready) {return};
@@ -116,11 +117,16 @@ function draw() {
     /* PROBLEEM: Bullet hit wall, wordt geremoved, kan dus niet meer showen
        FIX: Omdraaien, maar dus wel 1 frame achter
     */
-    world.bullets[i].show();
+    if i.hit(screen_rect) world.bullets[i].show();
     world.bullets[i].update();
   }
   for (let i of world.items) {
-    i.show();
+    if i.hit(screen_rect) i.show();
+    if (player.hit(i)){
+      player.useItem(i);
+      i.remove();
+      // server vertellen dat item weg is
+    } 
   }
   
   do_particles(dt);

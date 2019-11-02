@@ -55,10 +55,9 @@ class Player extends SolidRect {
   useItem(item) {
     let t = item.type;
     if (t == 'size') {
-      player.w *= random([1, 1, 0.5, 2]);
-      player.h *= random([1, 1, 0.5, 2]);
+      player.w *= random([1, 0.5, 2]);
+      player.h *= random([1, 0.5, 2]);
     }
-    // stuur naar server dat item weg
-    // item.destroy() ofzo
+    this.itemExparationTime = world.now() + item.duration;
   }
 }
