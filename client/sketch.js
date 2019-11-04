@@ -63,7 +63,7 @@ function on_server_welcome(p, w) {
 
 }
 
-function on_server_update(players, new_bullets, bullet_hits) {
+function on_server_update(players, new_bullets, bullet_hits, new_items, used_items) {
   if (!ready) return;
   // update the players except if it's the player then use the player with the energy update
   world.players = players.map(o => (o.id == player.id) ? player : Player.from_obj(o));
@@ -77,6 +77,15 @@ function on_server_update(players, new_bullets, bullet_hits) {
         console.log("bullet_hit_event", bullet_hits);
         world.bullets[i].hit_obj(target);
       }
+    }
+  }
+  for (let i of new_items) {
+    world.items.push(new Item(i.x, i.y, i.type, i.c, i.id, i.duration))
+  }
+  for (let id of used_items) {
+    console.log('useeed', used_items)
+    for (let item of world.items) {
+      if (item.id == id) item.remove();
     }
   }
 }
@@ -124,8 +133,8 @@ function draw() {
     if (i.hit(screen_rect)) i.show();
     if (player.hit(i)){
       player.useItem(i);
+      socket.emit('item_used', i.id);
       i.remove();
-      // server vertellen dat item weg is
     } 
   }
   

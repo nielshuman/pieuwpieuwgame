@@ -1,5 +1,5 @@
 class Item extends Rect {
-	constructor(x, y, type, c, duration=30000) {
+	constructor(x, y, type, c, id, duration=30000) {
 		super(x, y, 16, 16, c ? c : random(['#66FF66', '#50BFE6', '#FD3A4A']));
 		this.type = type;
 		let c1 = color(c); c1.setAlpha(64);
@@ -8,6 +8,7 @@ class Item extends Rect {
 		this.pal = [c, c1, c2, c3];
 		this.random = random() * TAU;
 		this.duration = duration;
+		this.id = id;
 	}
 
     show() {

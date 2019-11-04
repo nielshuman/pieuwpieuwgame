@@ -1,6 +1,7 @@
 const player_size = 32;
 let world_radius = 1000;
-let world_size = world_radius * 2
+let world_size = world_radius * 2;
+let item_spawn_rate = 60;
 let log_level = 3;
 
 const log = (level, ...text) => { if (level <= log_level) console.log(`[${level}]`, ...text); }
@@ -55,12 +56,15 @@ class World {
   }
 
   newItem() {
-    let p;
+    let i;
     while (true) {
       i = new Rect(world_radius * rand(-1, 1), world_radius * rand(-1, 1));
       if (!world.walls.some(w => w.hit(i)) && !world.players.some(p => p.hit(i))) break;
     }
-    i.type = choose(['size']);
+    i.type = choose(['size', 'speed']);
+    i.id = `${this.now()}:${Math.random().toString(36).substr(2, 9)}`;
+    i.c = choose(['#66FF66', '#50BFE6', '#FD3A4A']);
+    new_items.push(i);
     return i;
   }
 
@@ -73,6 +77,10 @@ class World {
     p.username = pu.username;
     p.dx = pu.dx;
     p.dy = pu.dy;
+    p.w = pu.w;
+    p.h = pu.h;
+    p.color = pu.color;
+    p.speed = pu.speed;
   }
 
   removePlayer(id) {
@@ -119,15 +127,18 @@ var flags = require('yargs')
     .option('interval', {alias: 'i', default: 100, describe: 'Interval in miliseconds of sending data'})
     .option('log_level', {alias: 'l', default: log_level, describe: 'Amount of log, 4=everything, 3=normal, 2=only join/error/system, 1=only error/system'})
     .option('world_radius', {default: world_radius, describe: 'Size of world'})
+    .option('item_spawn_rate', {default: item_spawn_rate, describe: 'Interval in seconds of spawning items'})
     .help()
     .argv;
 
 log_level = flags.l; // 4=everything, 3=normal, 2=only join/error/system,  1=only error/system
 world_radius = flags.world_radius;
 world_size = world_radius * 2;
+item_spawn_rate = flags.item_spawn_rate;
 
-log(4, 'log_level = ' + log_level);
-log(4, 'world_radius = ' + world_radius);
+log(4, 'log_level = ', log_level);
+log(4, 'world_radius = ', world_radius);
+log(4, 'item_spawn_rate = ', item_spawn_rate)
 log(4, 'Starting server!');
 
 // Http server
@@ -180,20 +191,28 @@ io.sockets.on('connection', socket => {
       io.to(target.id).emit('damage', b.power);
     });
 
-    socket.on('item_used', item => {
-      used_items.push(item.id);
+    socket.on('item_used', itemid => {
+      log(4, 'item used by ' + id, itemid);
+      used_items.push(itemid);
     });
 })
 
+let next_newitem = world.now();
+
 function heartbeat() {
+  if (next_newitem < world.now()) {
+    world.newItem();
+    next_newitem = world.now() + item_spawn_rate*1000;
+    log(4, 'New Item!')
+  }
   for (let player of world.players) { // only 'ready clients' update
     io.to(player.id).emit('server_update', world.players, new_bullets, bullet_hits, new_items, used_items);
   }
-  leegarr(bullet_hits, new_bullets, new_items, used_items)
+  leegarr(bullet_hits, new_bullets, new_items, used_items);
 }
 
 const myRL = require("serverline")
-myRL.setCompletion(['world', 'world.bullets', 'world.players', 'world.bullets', 'world.players'])
+myRL.setCompletion(['world', 'world.bullets', 'world.players', 'world.bullets', 'world.players', 'world.newItem()'])
 myRL.init()
 myRL.setPrompt('> ')
 myRL.on('line', function(line) {
