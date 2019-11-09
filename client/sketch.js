@@ -56,14 +56,9 @@ function on_server_welcome(p, w) {
   player.hit_list = world.walls;
   player.color = p.color;
   ready = true;
-
-  let item = new Item(20, 20, 'speed', '#66FF66'); // test item
-  world.items = [item];
-
-
 }
 
-function on_server_update(players, new_bullets, bullet_hits, new_items, used_items) {
+function on_server_update(players, new_bullets, bullet_hits, items) {
   if (!ready) return;
   // update the players except if it's the player then use the player with the energy update
   world.players = players.map(o => (o.id == player.id) ? player : Player.from_obj(o));
@@ -79,15 +74,7 @@ function on_server_update(players, new_bullets, bullet_hits, new_items, used_ite
       }
     }
   }
-  for (let i of new_items) {
-    world.items.push(new Item(i.x, i.y, i.type, i.c, i.id, i.duration))
-  }
-  for (let id of used_items) {
-    console.log('useeed', used_items)
-    for (let item of world.items) {
-      if (item.id == id) item.remove();
-    }
-  }
+  world.items = items.map(o => Item.from_obj(o));
 }
 
 let screenshake = 0, screen_shake_size = 4;
@@ -102,7 +89,7 @@ function draw() {
   dt = time - prev_time;
   // controls and movement
   let speed = 0.42 * dt;
-  if (keyIsDown(87 /*W*/) || keyIsDown(UP_ARROW))    player.move(0, -speed); 
+  if (keyIsDown(87 /*W*/) || keyIsDown(UP_ARROW))    player.move(0, -speed);
   if (keyIsDown(83 /*S*/) || keyIsDown(DOWN_ARROW))  player.move(0, speed);
   if (keyIsDown(65 /*A*/) || keyIsDown(LEFT_ARROW))  player.move(-speed, 0);
   if (keyIsDown(68 /*D*/) || keyIsDown(RIGHT_ARROW)) player.move(speed, 0);
@@ -123,23 +110,20 @@ function draw() {
     if (p.hit(screen_rect)) (p.id == player.id ? player : p).show();
   }
   for (let i = world.bullets.length - 1; i >= 0; i--) {
-    /* PROBLEEM: Bullet hit wall, wordt geremoved, kan dus niet meer showen
-       FIX: Omdraaien, maar dus wel 1 frame achter
-    */
-    if (world.bullets[i].hit(screen_rect)) world.bullets[i].show();
-    world.bullets[i].update();
+    const bullet = world.bullets[i];
+    bullet.update();
+    if (bullet.hit(screen_rect)) bullet.show();
   }
-  for (let i of world.items) {
-    if (i.hit(screen_rect)) i.show();
-    if (player.hit(i)){
-      player.useItem(i);
-      socket.emit('item_used', i.id);
-      i.remove();
-    } 
+  for (let i = world.items.length - 1; i >= 0; i--) {
+    const item = world.items[i];
+    if (item.hit(screen_rect)) {
+      item.show();
+      if (player.hit(item)){
+        player.useItem(item);
+      }
+    }
   }
-  
   do_particles(dt);
-
   pop();
 
   if (time > next_update_time) {
@@ -147,14 +131,14 @@ function draw() {
     next_update_time = time + 100; // upadet every 100ms
   }
 
-  if (player.itemExparationTime != -1 && player.itemExparationTime < time) player.clearEffects();
+  if (player.itemExpirationTime != -1 && player.itemExpirationTime < time) player.clearEffects();
 
   if (frameCount % 20 == 0) fps = frameRate();
   fill(255);
   stroke(0);
   text(`FPS: ${fps.toFixed(2)}`, 10, height - 10);
   text(`NOW: ${world.now()}`, 10, height - 30);
-  text(`IET: ${player.itemExparationTime}`, 10, height - 50)
+  text(`IET: ${player.itemExpirationTime}`, 10, height - 50)
   player.username = username_box.value().substring(0, 26).toUpperCase();
   if (player.energy > 0) player.energy = min(100, player.energy + 3 * dt / 1000);
 }

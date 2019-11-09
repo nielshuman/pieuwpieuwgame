@@ -5,7 +5,7 @@ class Player extends SolidRect {
     this.id = id;
     this.speed = 1;
     this.standard_size = w;
-    this.itemExparationTime = -1;
+    this.itemExpirationTime = -1;
   }
 
   static from_obj(o) {
@@ -45,8 +45,14 @@ class Player extends SolidRect {
     if (this.energy < 67) c = "#ff08";
     if (this.energy < 25) c = "#f008";
     stroke(c);
-    const r = this.energy * TAU / 100;
+    let r = this.energy * TAU / 100;
     if (r > 0) arc(0, 0, this.w * 2, this.h * 2, 1.5 * PI, 1.5 * PI + r);
+    r = this.itemExpirationTime - world.now();
+    if (this.activeItem && r > 0) {
+      r *= TAU / this.activeItem.duration;
+      stroke(this.activeItem.color);
+      arc(0, 0, this.w * 2.5, this.h * 2.5, 1.5 * PI, 1.5 * PI + r);
+    }
     // username
     textAlign(CENTER);
     textFont(font, 24);
@@ -56,21 +62,24 @@ class Player extends SolidRect {
   }
 
   useItem(item) {
-    let t = item.type;
-    if (t == 'size') {
+    if (this.itemExpirationTime > 0) return;
+    this.itemExpirationTime = world.now() + item.duration;
+    this.activeItem = item;
+    if (item.type == 'size') {
       player.w *= random([1, 0.5, 2]);
       player.h *= random([1, 0.5, 2]);
     }
-    if (t == 'speed') {
+    if (item.type == 'speed') {
       this.speed *= 1.5;
     }
-    this.itemExparationTime = world.now() + item.duration;
+    socket.emit('item_used', item.id);
+    item.remove();
   }
 
   clearEffects() {
     this.w = this.standard_size;
     this.h = this.standard_size;
     this.speed = 1;
-    this.itemExparationTime = -1;
+    this.itemExpirationTime = -1;
   }
 }

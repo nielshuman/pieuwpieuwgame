@@ -1,8 +1,8 @@
-const player_size = 32;
+const player_size = 32, item_size = 16;
 let world_radius = 1000;
 let world_size = world_radius * 2;
-let item_spawn_rate = 60;
-let log_level = 3;
+let item_spawn_rate = 10;
+let log_level = 4;
 
 const log = (level, ...text) => { if (level <= log_level) console.log(`[${level}]`, ...text); }
 const rand = (lo, hi) => lo + (hi - lo) * Math.random();
@@ -10,12 +10,12 @@ const constrain = (n, lo, hi) => Math.max(Math.min(n, hi), lo);
 const choose = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const floor = Math.floor;
 const abs = Math.abs;
-const leegarr = (...arr) => {for (let a of arr) a.splice(0, a.length)}
 
 class World {
   constructor() {
     this.players = [];
     this.walls = [];
+    this.items = [];
     this.start_time = Date.now();
     this.age = 0;
     this.generate_walls();
@@ -56,16 +56,16 @@ class World {
   }
 
   newItem() {
-    let i;
+    let item;
     while (true) {
-      i = new Rect(world_radius * rand(-1, 1), world_radius * rand(-1, 1));
-      if (!world.walls.some(w => w.hit(i)) && !world.players.some(p => p.hit(i))) break;
+      item = new Rect(world_radius * rand(-1, 1), world_radius * rand(-1, 1), item_size, item_size);
+      if (!world.walls.some(w => w.hit(item)) && !world.players.some(p => p.hit(item))) break;
     }
-    i.type = choose(['size', 'speed']);
-    i.id = `${this.now()}:${Math.random().toString(36).substr(2, 9)}`;
-    i.c = choose(['#66FF66', '#50BFE6', '#FD3A4A']);
-    new_items.push(i);
-    return i;
+    item.duration = 30000;
+    item.type = choose(['size', 'speed']);
+    item.id = `${this.now()}:${Math.random().toString(36).substr(2, 9)}`;
+    this.items.push(item);
+    return item;
   }
 
   updatePlayer(pu) {
@@ -84,8 +84,13 @@ class World {
   }
 
   removePlayer(id) {
-    for (var i = this.players.length - 1; i >= 0; i--) {
+    for (let i = this.players.length - 1; i >= 0; i--) {
       if (this.players[i].id == id) this.players.splice(i, 1);
+    }
+  }
+  removeItem(id) {
+    for (let i = this.items.length - 1; i >= 0; i--) {
+      if (this.items[i].id == id) this.items.splice(i, 1);
     }
   }
 
@@ -148,17 +153,15 @@ let server = app.listen(flags.p, () => log(1, 'Server listening at port ' + serv
 app.use(express.static('client'));
 let io = require('socket.io')(server); // socket.io uses http server
 
-const readline = require('readline').createInterface({
-  input: process.stdin,
-  output: process.stdout
-})
+// const readline = require('readline').createInterface({
+//   input: process.stdin,
+//   output: process.stdout
+// })
 // ========= BEGIN =========================================================
 
 let world = new World();
 let bullet_hits = [];
 let new_bullets = [];
-let new_items = [];
-let used_items = [];
 
 io.sockets.on('connection', socket => {
     let id = socket.id.substring(16, 20) // last 4 charaters are less nonsense
@@ -193,7 +196,7 @@ io.sockets.on('connection', socket => {
 
     socket.on('item_used', itemid => {
       log(4, 'item used by ' + id, itemid);
-      used_items.push(itemid);
+      world.removeItem(itemid)
     });
 })
 
@@ -206,14 +209,15 @@ function heartbeat() {
     log(4, 'New Item!')
   }
   for (let player of world.players) { // only 'ready clients' update
-    io.to(player.id).emit('server_update', world.players, new_bullets, bullet_hits, new_items, used_items);
+    io.to(player.id).emit('server_update', world.players, new_bullets, bullet_hits, world.items);
   }
-  leegarr(bullet_hits, new_bullets, new_items, used_items);
+  bullet_hits = [];
+  new_bullets = [];
 }
 
 const myRL = require("serverline")
 myRL.setCompletion(['world', 'world.bullets', 'world.players', 'world.bullets', 'world.players', 'world.newItem()'])
-myRL.init()
+myRL.init({'forceTerminalContext':true})
 myRL.setPrompt('> ')
 myRL.on('line', function(line) {
   try {
