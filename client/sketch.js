@@ -9,7 +9,7 @@ const pre_names = ["super", "mad ", "mega", "ultra", "hyper", "power", "giga",
 "insane ", "bad ", "zombie ", "robot ", "ninja ", "pirate ",
 "screaming ", "angry ", "happy ", "danger "];
 
-let username_box;
+let username_box, messages_box;
 let walls = [], player, ready, world, socket;
 let W, H, W2, H2, fps = 0, screen_rect;
 let time;
@@ -38,11 +38,17 @@ function setup() {
   socket.emit('player_join');
   username_box = select("#username");
   username_box.value((random() < 0.5) ? random(names) + ' ' + random(post_names) : random(pre_names) + random(names));
+  messages_box = select("#messages");
   masterVolume(0);
 }
 
-function on_damage(amount) {
+function on_damage(amount, author) {
   player.energy = max(0, player.energy - amount);
+  if (player.energy <= 0) {
+    console.log('ded')
+    socket.emit('server_message', `${author.username} KILLED ${player.username}`);
+    player.hit_list = [];
+  }
 }
 
 function on_server_welcome(p, w) {
@@ -58,7 +64,7 @@ function on_server_welcome(p, w) {
   ready = true;
 }
 
-function on_server_update(players, new_bullets, bullet_hits, items) {
+function on_server_update(players, new_bullets, bullet_hits, items, new_messages) {
   if (!ready) return;
   // update the players except if it's the player then use the player with the energy update
   world.players = players.map(o => (o.id == player.id) ? player : Player.from_obj(o));
@@ -75,6 +81,8 @@ function on_server_update(players, new_bullets, bullet_hits, items) {
     }
   }
   world.items = items.map(o => Item.from_obj(o));
+  if (new_messages) messages_box.innerHTML = new_messages.join("<br />");
+  // for (let msg of new_messages) messages_box.innerHTML (msg);
 }
 
 let screenshake = 0, screen_shake_size = 4;
@@ -156,7 +164,7 @@ function keyPressed() {
     let dx = player.dx, dy = player.dy;
     let x = player.mx + dx * player.w / 2;
     let y = player.my + dy * player.h / 2;
-    const bullet_cost = (key == ' ') ? 4 : 0; // 'b' is cheat free bullet
+    const bullet_cost = (key == ' ') ? 2.5 : 0; // 'b' is cheat free bullet
     if (player.energy > bullet_cost) {
       player.energy -= bullet_cost;
       let bullet_power = 17 - 0.1 * player.energy;

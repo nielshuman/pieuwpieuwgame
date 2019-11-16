@@ -6,6 +6,7 @@ class Player extends SolidRect {
     this.speed = 1;
     this.standard_size = w;
     this.itemExpirationTime = -1;
+    this.activeItem = 0;
   }
 
   static from_obj(o) {
@@ -14,6 +15,8 @@ class Player extends SolidRect {
     p.username = o.username;
     p.dx = o.dx;
     p.dy = o.dy;
+    p.activeItem = o.activeItem;
+    p.itemExpirationTime = o.itemExpirationTime;
     return p;
   }
 
@@ -34,7 +37,6 @@ class Player extends SolidRect {
       noStroke(); fill(this.color);
     } else {
       noFill(); stroke(this.color);
-      this.hit_list = [];
     }
     rect(0, 0, this.w + 2 * wob, this.h - 2 * wob, 8, 8);
     noFill(); stroke("#0006"); strokeWeight(3.0);
@@ -63,6 +65,7 @@ class Player extends SolidRect {
 
   useItem(item) {
     if (this.itemExpirationTime > 0) return;
+    if (this.energy <= 0) return;
     this.itemExpirationTime = world.now() + item.duration;
     this.activeItem = item;
     if (item.type == 'size') {
@@ -81,5 +84,6 @@ class Player extends SolidRect {
     this.h = this.standard_size;
     this.speed = 1;
     this.itemExpirationTime = -1;
+    this.activeItem = 0;
   }
 }

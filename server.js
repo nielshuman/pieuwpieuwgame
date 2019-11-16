@@ -81,6 +81,8 @@ class World {
     p.h = pu.h;
     p.color = pu.color;
     p.speed = pu.speed;
+    p.activeItem = pu.activeItem;
+    p.itemExpirationTime = pu.itemExpirationTime;
   }
 
   removePlayer(id) {
@@ -190,29 +192,38 @@ io.sockets.on('connection', socket => {
 
     socket.on('bullet_hit', (b, target) => {
       bullet_hits.push({b: b, target: target});
-      log(4, "bullet_hit " + b.id + ' ' + target);
-      io.to(target.id).emit('damage', b.power);
+      let author = world.findPlayerById(b.author);
+      if (author && typeof target.username === 'string') {
+        log(4, "bullet_hit", author.username);
+        io.to(target.id).emit('damage', b.power, author);
+        if (target.energy - b.power <= 0) { // if is dead
+          log(3, author.username, 'killed', target.username)
+        }
+      }
     });
 
     socket.on('item_used', itemid => {
       log(4, 'item used by ' + id, itemid);
       world.removeItem(itemid)
     });
+
+    socket.on('server_message', msg => new_messages.push(msg))
 })
 
 let next_newitem = world.now();
 
 function heartbeat() {
-  if (next_newitem < world.now()) {
+  if (next_newitem < world.now() && world.items.length < world.players.length + 2) {
     world.newItem();
     next_newitem = world.now() + item_spawn_rate*1000;
     log(4, 'New Item!')
   }
   for (let player of world.players) { // only 'ready clients' update
-    io.to(player.id).emit('server_update', world.players, new_bullets, bullet_hits, world.items);
+    io.to(player.id).emit('server_update', world.players, new_bullets, bullet_hits, world.items, new_messages);
   }
   bullet_hits = [];
   new_bullets = [];
+  new_messages = [];
 }
 
 const myRL = require("serverline")
