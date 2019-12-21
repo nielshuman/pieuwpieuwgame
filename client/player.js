@@ -26,6 +26,22 @@ class Player extends SolidRect {
     this.dy = Math.sign(dy);
   }
 
+  shoot(bullet_cost=2.5) {
+    let dx = this.dx, dy = this.dy;
+    let x = this.mx + dx * this.w / 2;
+    let y = this.my + dy * this.h / 2;
+    if (this.energy > bullet_cost) {
+      this.energy -= bullet_cost;
+      let bullet_power = 17 - 0.1 * this.energy;
+      let b = new Bullet(x, y, dx, dy, bullet_power, this.id);
+      socket.emit('bullet_new', b);
+      world.bullets.push(b);
+      shootSound.play();
+      fx_shoot(x, y, dx, dy);
+    }
+
+  }
+
   show() {
     push();
     rectMode(CENTER);
@@ -69,8 +85,8 @@ class Player extends SolidRect {
     this.itemExpirationTime = world.now() + item.duration;
     this.activeItem = item;
     if (item.type == 'size') {
-      player.w *= random([1, 0.5, 2]);
-      player.h *= random([1, 0.5, 2]);
+      this.w *= random([1, 0.5, 2]);
+      this.h *= random([1, 0.5, 2]);
     }
     if (item.type == 'speed') {
       this.speed *= 1.5;

@@ -161,19 +161,7 @@ function keyPressed() {
       console.log('Muted');
     }
   } else if (key == ' ' || key == 'j') {
-    let dx = player.dx, dy = player.dy;
-    let x = player.mx + dx * player.w / 2;
-    let y = player.my + dy * player.h / 2;
-    const bullet_cost = (key == ' ') ? 2.5 : 0; // 'b' is cheat free bullet
-    if (player.energy > bullet_cost) {
-      player.energy -= bullet_cost;
-      let bullet_power = 17 - 0.1 * player.energy;
-      let b = new Bullet(x, y, dx, dy, bullet_power, player.id);
-      socket.emit('bullet_new', b);
-      world.bullets.push(b);
-      shootSound.play();
-      fx_shoot(x, y, dx, dy);
-    }
+      player.shoot(key == 'j'? 0 : 2.5)
   } else if (key == 'x') {
       player.energy = max(0, player.energy - random(10,30));
   }
