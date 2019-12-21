@@ -13,14 +13,15 @@ let username_box, messages_box;
 let walls = [], player, ready, world, socket;
 let W, H, W2, H2, fps = 0, screen_rect;
 let time, show_debug_info = false;
+let shootSound, font;
 
-
-let shootSound, hitSound, wallHitSound, font;
 function preload() {
   soundFormats('wav');
-  shootSound = loadSound('assets/shoot.wav');
-  hitSound = loadSound('assets/hit.wav');
-  wallHitSound = loadSound('assets/hitwall.wav');
+  shootSounds = [];
+  for (var i = 1; i <= 6; i++) shootSounds.push(loadSound(`assets/piew-0${i}.mp3`))
+  dedSound = loadSound('assets/ded.mp3')
+  // hitSound = loadSound('assets/hit.wav');
+  // wallHitSound = loadSound('assets/hitwall.wav');
   font = loadFont('assets/gamer.ttf');
 }
 
@@ -40,6 +41,7 @@ function setup() {
   username_box.value((random() < 0.5) ? random(names) + ' ' + random(post_names) : random(pre_names) + random(names));
   messages_box = select("#messages");
   masterVolume(0);
+  window.focus();
 }
 
 function on_damage(amount, author) {
@@ -48,6 +50,7 @@ function on_damage(amount, author) {
     console.log('ded')
     socket.emit('server_message', `${author.username} KILLED ${player.username}`);
     player.hit_list = [];
+    dedSound.play();
   }
 }
 
@@ -167,7 +170,7 @@ function keyPressed() {
   } else if (key == 'x') {
       player.energy = max(0, player.energy - random(10,30));
   } else if (key == 'd') {
-    show_debug_info = !show_debug_info
+    show_debug_info = !show_debug_info;
   }
 }
 
