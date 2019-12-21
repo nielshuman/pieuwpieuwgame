@@ -13,16 +13,21 @@ let username_box, messages_box;
 let walls = [], player, ready, world, socket;
 let W, H, W2, H2, fps = 0, screen_rect;
 let time, show_debug_info = false;
-let shootSound, font;
+let shootSounds, font;
+let playerHitSounds, dedSound;
+let pointerImage;
 
 function preload() {
-  soundFormats('wav');
+  soundFormats('mp3');
   shootSounds = [];
-  for (var i = 1; i <= 6; i++) shootSounds.push(loadSound(`assets/piew-0${i}.mp3`))
+  for (var i = 1; i <= 6; i++) shootSounds.push(loadSound(`assets/piew-0${i}.mp3`));
+  playerHitSounds = [];
+  for (var i = 1; i <= 8; i++) playerHitSounds.push(loadSound(`assets/playerhit-0${i}.mp3`));
   dedSound = loadSound('assets/ded.mp3')
   // hitSound = loadSound('assets/hit.wav');
   // wallHitSound = loadSound('assets/hitwall.wav');
   font = loadFont('assets/gamer.ttf');
+  pointerImage = loadImage('assets/pointer.png');
 }
 
 let canvas;
@@ -42,15 +47,19 @@ function setup() {
   messages_box = select("#messages");
   masterVolume(0);
   window.focus();
+  // shootButton = new Button(width - 200, height - 200, 100, pointerImage);
 }
 
 function on_damage(amount, author) {
   player.energy = max(0, player.energy - amount);
   if (player.energy <= 0) {
-    console.log('ded')
     socket.emit('server_message', `${author.username} KILLED ${player.username}`);
     player.hit_list = [];
     dedSound.play();
+  } else {
+    let snd = random(playerHitSounds);
+    snd.rate(random(0.8, 1.2));
+    snd.play();    
   }
 }
 
@@ -60,7 +69,6 @@ function on_server_welcome(p, w) {
   // are not visible. but maybe hit the player?
   world = new World(w);
   time = world.now();
-  console.log("p", p);
   player = Player.from_obj(p);
   player.hit_list = world.walls;
   player.color = p.color;
@@ -141,7 +149,7 @@ function draw() {
     socket.emit('player_update', player);
     next_update_time = time + 100; // upadet every 100ms
   }
-
+  // shootButton.show();
   if (player.itemExpirationTime != -1 && player.itemExpirationTime < time) player.clearEffects();
 
   if (frameCount % 20 == 0) fps = frameRate();
@@ -154,6 +162,10 @@ function draw() {
   text(`FPS: ${fps.toFixed(2)}`, 10, height - 10);
   text(`NOW: ${world.now()}`, 10, height - 30);
   text(`IET: ${player.itemExpirationTime}`, 10, height - 50)
+}
+
+function mouseClicked() {
+  // shootButton.click();
 }
 
 function keyPressed() {
