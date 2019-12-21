@@ -41,6 +41,9 @@ class Bullet extends Rect {
       if (this.hit(p) && this.author != p.id && p.energy > 0) {
         console.log("hit player", this.author, p.id, player.id);
         this.hit_obj(p);
+        let snd = random(playerHitSounds);
+        snd.rate(random(0.8, 1.2));
+        snd.play();    
         return;
       }
     }

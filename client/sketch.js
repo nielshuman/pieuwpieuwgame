@@ -56,10 +56,6 @@ function on_damage(amount, author) {
     socket.emit('server_message', `${author.username} KILLED ${player.username}`);
     player.hit_list = [];
     dedSound.play();
-  } else {
-    let snd = random(playerHitSounds);
-    snd.rate(random(0.8, 1.2));
-    snd.play();    
   }
 }
 
