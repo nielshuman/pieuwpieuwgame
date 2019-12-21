@@ -47,11 +47,6 @@ class Bullet extends Rect {
   }
   hit_obj(target) {
     console.log("hit_obj", target);
-    if (target instanceof Player) {
-      hitSound.play();
-    } else {
-      wallHitSound.play();
-    }
     this.explode();
     this.remove();
     if (this.author == player.id) socket.emit('bullet_hit', this, target);

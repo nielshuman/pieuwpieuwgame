@@ -36,7 +36,9 @@ class Player extends SolidRect {
       let b = new Bullet(x, y, dx, dy, bullet_power, this.id);
       socket.emit('bullet_new', b);
       world.bullets.push(b);
-      shootSound.play();
+      let snd = random(shootSounds);
+      snd.rate(random(0.8, 1.2));
+      snd.play();
       fx_shoot(x, y, dx, dy);
     }
 
