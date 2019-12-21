@@ -12,7 +12,7 @@ const pre_names = ["super", "mad ", "mega", "ultra", "hyper", "power", "giga",
 let username_box, messages_box;
 let walls = [], player, ready, world, socket;
 let W, H, W2, H2, fps = 0, screen_rect;
-let time;
+let time, show_debug_info = false;
 
 
 let shootSound, hitSound, wallHitSound, font;
@@ -142,13 +142,15 @@ function draw() {
   if (player.itemExpirationTime != -1 && player.itemExpirationTime < time) player.clearEffects();
 
   if (frameCount % 20 == 0) fps = frameRate();
+  if (player.energy > 0) player.energy = min(100, player.energy + 3 * dt / 1000);
+  player.username = username_box.value().substring(0, 26).toUpperCase();
+  
+  if (!show_debug_info) return;
   fill(255);
   stroke(0);
   text(`FPS: ${fps.toFixed(2)}`, 10, height - 10);
   text(`NOW: ${world.now()}`, 10, height - 30);
   text(`IET: ${player.itemExpirationTime}`, 10, height - 50)
-  player.username = username_box.value().substring(0, 26).toUpperCase();
-  if (player.energy > 0) player.energy = min(100, player.energy + 3 * dt / 1000);
 }
 
 function keyPressed() {
@@ -164,6 +166,8 @@ function keyPressed() {
       player.shoot(key == 'j'? 0 : 2.5)
   } else if (key == 'x') {
       player.energy = max(0, player.energy - random(10,30));
+  } else if (key == 'd') {
+    show_debug_info = !show_debug_info
   }
 }
 
