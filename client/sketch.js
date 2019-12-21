@@ -13,12 +13,13 @@ let username_box, messages_box;
 let walls = [], player, ready, world, socket;
 let W, H, W2, H2, fps = 0, screen_rect;
 let time, show_debug_info = false;
-
+let shootSounds, hitSound, wallHitSound;
 
 let shootSound, hitSound, wallHitSound, font;
 function preload() {
   soundFormats('wav');
-  shootSound = loadSound('assets/shoot.wav');
+  shootSounds = [];
+  for (var i = 1; i <= 6; i++) shootSounds.push(loadSound(`assets/piew-${i}.mp3`))
   hitSound = loadSound('assets/hit.wav');
   wallHitSound = loadSound('assets/hitwall.wav');
   font = loadFont('assets/gamer.ttf');
