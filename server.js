@@ -2,6 +2,7 @@ const player_size = 32, item_size = 16;
 let world_radius = 1000;
 let world_size = world_radius * 2;
 let item_spawn_rate = 10;
+let item_duration = 15000;
 let log_level = 4;
 
 const log = (level, ...text) => { if (level <= log_level) console.log(`[${level}]`, ...text); }
@@ -61,7 +62,7 @@ class World {
       item = new Rect(world_radius * rand(-1, 1), world_radius * rand(-1, 1), item_size, item_size);
       if (!world.walls.some(w => w.hit(item)) && !world.players.some(p => p.hit(item))) break;
     }
-    item.duration = 30000;
+    item.duration = item_duration;
     item.type = choose(['size', 'speed']);
     item.id = `${this.now()}:${Math.random().toString(36).substr(2, 9)}`;
     this.items.push(item);
