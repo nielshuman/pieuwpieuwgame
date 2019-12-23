@@ -204,7 +204,10 @@ io.sockets.on('connection', socket => {
       world.removeItem(itemid)
     });
 
-    socket.on('server_message', msg => new_messages.push(msg))
+    socket.on('server_message', msg => {
+      new_messages.push(msg);
+      log(3, id, 'says', `\"${msg}\"`)
+    })
 })
 
 let next_newitem = world.now();
