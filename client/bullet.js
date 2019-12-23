@@ -32,14 +32,14 @@ class Bullet extends Rect {
     this.y = this.y0 + this.vy * age;
     for (let wall of world.walls) { // if hit wall
       if (this.hit(wall)) {
-        console.log("hit wall");
+        log(2, "hit wall");
         this.hit_obj(wall);
         return;
       }
     }
     for (let p of world.players) { // if hit a player
       if (this.hit(p) && this.author != p.id && p.energy > 0) {
-        console.log("hit player", this.author, p.id, player.id);
+        log(2, "hit player", this.author, p.id, player.id);
         this.hit_obj(p);
         let snd = random(playerHitSounds);
         snd.rate(random(0.8, 1.2));
@@ -49,7 +49,7 @@ class Bullet extends Rect {
     }
   }
   hit_obj(target) {
-    console.log("hit_obj", target);
+    log(2, "hit_obj", target);
     this.explode();
     this.remove();
     if (this.author == player.id) socket.emit('bullet_hit', this, target);

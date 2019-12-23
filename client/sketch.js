@@ -16,17 +16,21 @@ let time, show_debug_info = false;
 let shootSounds, font;
 let playerHitSounds, dedSound;
 let pointerImage;
+let log_level = 2;
+
+const log = (level, ...text) => { if (level <= log_level) console.log(`[${level}]`, ...text); }
 
 function preload() {
+  log(2, '=== PRELOAD ===');
   soundFormats('mp3');
   shootSounds = [];
   for (var i = 1; i <= 6; i++) shootSounds.push(loadSound(`assets/piew-0${i}.mp3`));
   playerHitSounds = [];
   for (var i = 1; i <= 8; i++) playerHitSounds.push(loadSound(`assets/playerhit-0${i}.mp3`));
-  dedSound = loadSound('assets/ded.mp3')
+  dedSound = loadSound('assets/ded.mp3', ()=>log(2, 'dedSound loaded'))
   // hitSound = loadSound('assets/hit.wav');
   // wallHitSound = loadSound('assets/hitwall.wav');
-  font = loadFont('assets/gamer.ttf');
+  font = loadFont('assets/gamer.ttf', ()=>log(2, 'font loaded'));
   pointerImage = loadImage('assets/pointer.png');
 }
 
@@ -34,6 +38,7 @@ let canvas;
 let zoom = 1, vertical_view = 960;
 function setup() {
   // frameRate(30);
+  log(2, '=== SETUP ===');
   canvas = createCanvas(windowWidth, windowHeight);
   zoom = windowHeight / vertical_view;
   canvas.parent('#game_canvas')
@@ -53,6 +58,7 @@ function setup() {
 function on_damage(amount, author) {
   player.energy = max(0, player.energy - amount);
   if (player.energy <= 0) {
+    log(1, '=== DEAD ===')
     socket.emit('server_message', `${author.username} KILLED ${player.username}`);
     player.hit_list = [];
     dedSound.play();
@@ -63,6 +69,7 @@ function on_server_welcome(p, w) {
   // start signal from server
   // bullets are not initialized so any bullets flying when the player joins
   // are not visible. but maybe hit the player?
+  log(2, '=== SERVER_WELCOME ===');
   world = new World(w);
   time = world.now();
   player = Player.from_obj(p);
@@ -82,7 +89,7 @@ function on_server_update(players, new_bullets, bullet_hits, items, new_messages
     let b = bh.b, target = bh.target;
     for (let i = world.bullets.length - 1; i >= 0; i--) {
       if (world.bullets[i].id == b.id && b.author != player.id) {
-        console.log("bullet_hit_event", bullet_hits);
+        log(2, "bullet_hit_event", bullet_hits);
         world.bullets[i].hit_obj(target);
       }
     }
@@ -91,7 +98,7 @@ function on_server_update(players, new_bullets, bullet_hits, items, new_messages
   if (new_messages.length > 0) {
     messages_box.html(new_messages.join("<br />"));
     // for (let msg of new_messages) messages_box.innerHTML (msg);
-    console.log(new_messages);
+    log(1, 'New message:', new_messages);
   }
 }
 
@@ -155,12 +162,13 @@ function draw() {
   if (player.energy > 0) player.energy = min(100, player.energy + 3 * dt / 1000);
   player.username = username_box.value().substring(0, 26).toUpperCase();
   
-  if (!show_debug_info) return;
+  if (!log_level) return;
   fill(255);
   stroke(0);
   text(`FPS: ${fps.toFixed(2)}`, 10, height - 10);
   text(`NOW: ${world.now()}`, 10, height - 30);
   text(`IET: ${player.itemExpirationTime}`, 10, height - 50)
+  text(`LOG: ${log_level}`, 10, height - 70);
 }
 
 function mouseClicked() {
@@ -171,17 +179,18 @@ function keyPressed() {
   if (key == 'm') {
     if (getMasterVolume() == 0) {
       masterVolume(1);
-      console.log('Unmuted');
+      log(1, 'Unmuted');
     } else {
       masterVolume(0);
-      console.log('Muted');
+      log(1, 'Muted');
     }
   } else if (key == ' ' || key == 'j') {
       player.shoot(key == 'j'? 0 : 2.5)
   } else if (key == 'x') {
       player.energy = max(0, player.energy - random(10,30));
-  } else if (key == 'd') {
-    show_debug_info = !show_debug_info;
+  } else if (key == 'l') {
+    log_level++;
+    log_level %= 3;
   }
 }
 
