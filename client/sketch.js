@@ -88,8 +88,11 @@ function on_server_update(players, new_bullets, bullet_hits, items, new_messages
     }
   }
   world.items = items.map(o => Item.from_obj(o));
-  if (new_messages) messages_box.innerHTML = new_messages.join("<br />");
-  // for (let msg of new_messages) messages_box.innerHTML (msg);
+  if (new_messages.length > 0) {
+    messages_box.html(new_messages.join("<br />"));
+    // for (let msg of new_messages) messages_box.innerHTML (msg);
+    console.log(new_messages);
+  }
 }
 
 let screenshake = 0, screen_shake_size = 4;

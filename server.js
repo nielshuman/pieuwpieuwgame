@@ -1,11 +1,11 @@
-const player_size = 32, item_size = 16;
-let world_radius = 1000;
-let world_size = world_radius * 2;
+let player_size = 32, item_size = 16;
+let world_radius = 1000, world_size = world_radius * 2;
 let item_spawn_rate = 10;
 let item_duration = 15000;
 let log_level = 4;
 
 const log = (level, ...text) => { if (level <= log_level) console.log(`[${level}]`, ...text); }
+const msg =  (...m) => new_messages = new_messages.concat(m);
 const rand = (lo, hi) => lo + (hi - lo) * Math.random();
 const constrain = (n, lo, hi) => Math.max(Math.min(n, hi), lo);
 const choose = (arr) => arr[Math.floor(Math.random() * arr.length)];
@@ -152,14 +152,10 @@ log(4, 'Starting server!');
 // Http server
 let express = require('express');
 let app = express();
-let server = app.listen(flags.p, () => log(1, 'Server listening at port ' + server.address().port));
+let server = app.listen(flags.p, () => log(1, 'Server listening at http://localhost:' + server.address().port));
 app.use(express.static('client'));
 let io = require('socket.io')(server); // socket.io uses http server
 
-// const readline = require('readline').createInterface({
-//   input: process.stdin,
-//   output: process.stdout
-// })
 // ========= BEGIN =========================================================
 
 let world = new World();
