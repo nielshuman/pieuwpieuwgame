@@ -94,6 +94,9 @@ class Player extends SolidRect {
     if (item.type == 'speed') {
       this.speed *= 1.5;
     }
+    if (item.type == 'health') {
+      this.energy = min(100, this.energy+50);
+    }
     socket.emit('item_used', item.id);
     item.remove();
   }

@@ -2,7 +2,8 @@ class Item extends Rect {
   constructor(x, y, type, id, duration) {
     const item_colors = {
       'size': '#FD3A4A',
-      'speed': '#50BFE6'
+      'speed': '#50BFE6',
+      'health': '#33cc33'
     }
     const c = item_colors[type];
     super(x, y, 16, 16, c);

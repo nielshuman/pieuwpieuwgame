@@ -62,8 +62,8 @@ class World {
       item = new Rect(world_radius * rand(-1, 1), world_radius * rand(-1, 1), item_size, item_size);
       if (!world.walls.some(w => w.hit(item)) && !world.players.some(p => p.hit(item))) break;
     }
-    item.duration = item_duration;
-    item.type = choose(['size', 'speed']);
+    item.type = choose(['size', 'speed', 'health']);
+    item.duration = ['health'].includes(item.type)? 0 : item_duration;
     item.id = `${this.now()}:${Math.random().toString(36).substr(2, 9)}`;
     this.items.push(item);
     return item;
@@ -214,9 +214,8 @@ let next_newitem = world.now();
 
 function heartbeat() {
   if (next_newitem < world.now() && world.items.length < world.players.length + 2) {
-    world.newItem();
+    log(4, `New ${world.newItem().type} Item!`)
     next_newitem = world.now() + item_spawn_rate*1000;
-    log(4, 'New Item!')
   }
   for (let player of world.players) { // only 'ready clients' update
     io.to(player.id).emit('server_update', world.players, new_bullets, bullet_hits, world.items, new_messages);
@@ -227,7 +226,7 @@ function heartbeat() {
 }
 
 const myRL = require("serverline")
-myRL.setCompletion(['world', 'world.bullets', 'world.players', 'world.bullets', 'world.players', 'world.newItem()'])
+myRL.setCompletion(['log_level', 'world', 'world.bullets', 'world.players', 'world.bullets', 'world.players', 'world.newItem()', 'msg()'])
 myRL.init({'forceTerminalContext':true})
 myRL.setPrompt('> ')
 myRL.on('line', function(line) {

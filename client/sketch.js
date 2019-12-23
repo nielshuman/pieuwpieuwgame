@@ -16,7 +16,7 @@ let time, show_debug_info = false;
 let shootSounds, font;
 let playerHitSounds, dedSound;
 let pointerImage;
-let log_level = 2;
+let log_level = 1;
 
 const log = (level, ...text) => { if (level <= log_level) console.log(`[${level}]`, ...text); }
 
