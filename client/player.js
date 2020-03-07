@@ -87,10 +87,6 @@ class Player extends SolidRect {
     this.itemExpirationTime = world.now() + item.duration;
     this.activeItem = item;
     log(1, 'using', item.type, 'item');
-    if (item.type == 'size') {
-      this.w *= random([1, 0.5, 2]);
-      this.h *= random([1, 0.5, 2]);
-    }
     if (item.type == 'speed') {
       this.speed *= 1.5;
     }

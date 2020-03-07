@@ -11,6 +11,7 @@ X extra snelheid
 - invisible (moet wel erg zeldzaam zijn denk ik)
 . sneller healen
 X dat je breedte halveert of verdubbelt, en de hoogte ook, met 50% kans beide0
+- speed op -1 zetten!!!!
 
 ### 1 actie items:
 X meer health
@@ -22,3 +23,5 @@ de hitbox van de bullets iets groter maken?
 screenshake harder als de explosie dichtbij is, zachter als explosie ver weg is. (geluiden ook!!!)
 
 chat/berichten dingetje met '**Puisje doom** killed **Woezel the Great**'
+
+geen xss in de screennames toelaten

@@ -18,19 +18,16 @@ let playerHitSounds, dedSound;
 let pointerImage;
 let log_level = 1;
 
-const log = (level, ...text) => { if (level <= log_level) console.log(`[${level}]`, ...text); }
-
 function preload() {
-  log(2, '=== PRELOAD ===');
   soundFormats('mp3');
   shootSounds = [];
   for (var i = 1; i <= 6; i++) shootSounds.push(loadSound(`assets/piew-0${i}.mp3`));
   playerHitSounds = [];
   for (var i = 1; i <= 8; i++) playerHitSounds.push(loadSound(`assets/playerhit-0${i}.mp3`));
-  dedSound = loadSound('assets/ded.mp3', ()=>log(2, 'dedSound loaded'))
+  dedSound = loadSound('assets/ded.mp3');
   // hitSound = loadSound('assets/hit.wav');
   // wallHitSound = loadSound('assets/hitwall.wav');
-  font = loadFont('assets/gamer.ttf', ()=>log(2, 'font loaded'));
+  font = loadFont('assets/gamer.ttf');
   pointerImage = loadImage('assets/pointer.png');
 }
 
@@ -38,7 +35,6 @@ let canvas;
 let zoom = 1, vertical_view = 960;
 function setup() {
   // frameRate(30);
-  log(2, '=== SETUP ===');
   canvas = createCanvas(windowWidth, windowHeight);
   zoom = windowHeight / vertical_view;
   canvas.parent('#game_canvas')
@@ -58,7 +54,6 @@ function setup() {
 function on_damage(amount, author) {
   player.energy = max(0, player.energy - amount);
   if (player.energy <= 0) {
-    log(1, '=== DEAD ===')
     socket.emit('server_message', `${author.username} KILLED ${player.username}`);
     player.hit_list = [];
     dedSound.play();
@@ -69,7 +64,6 @@ function on_server_welcome(p, w) {
   // start signal from server
   // bullets are not initialized so any bullets flying when the player joins
   // are not visible. but maybe hit the player?
-  log(2, '=== SERVER_WELCOME ===');
   world = new World(w);
   time = world.now();
   player = Player.from_obj(p);
@@ -89,7 +83,6 @@ function on_server_update(players, new_bullets, bullet_hits, items, new_messages
     let b = bh.b, target = bh.target;
     for (let i = world.bullets.length - 1; i >= 0; i--) {
       if (world.bullets[i].id == b.id && b.author != player.id) {
-        log(2, "bullet_hit_event", bullet_hits);
         world.bullets[i].hit_obj(target);
       }
     }
@@ -98,7 +91,6 @@ function on_server_update(players, new_bullets, bullet_hits, items, new_messages
   if (new_messages.length > 0) {
     messages_box.html(new_messages.join("<br />"));
     // for (let msg of new_messages) messages_box.innerHTML (msg);
-    log(1, 'New message:', new_messages);
   }
 }
 
@@ -179,10 +171,8 @@ function keyPressed() {
   if (key == 'm') {
     if (getMasterVolume() == 0) {
       masterVolume(1);
-      log(1, 'Unmuted');
     } else {
       masterVolume(0);
-      log(1, 'Muted');
     }
   } else if (key == ' ' || key == 'j') {
       player.shoot(key == 'j'? 0 : 2.5)

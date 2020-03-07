@@ -62,7 +62,7 @@ class World {
       item = new Rect(world_radius * rand(-1, 1), world_radius * rand(-1, 1), item_size, item_size);
       if (!world.walls.some(w => w.hit(item)) && !world.players.some(p => p.hit(item))) break;
     }
-    item.type = choose(['size', 'speed', 'health']);
+    item.type = choose(['speed', 'health']);
     item.duration = ['health'].includes(item.type)? 0 : item_duration;
     item.id = `${this.now()}:${Math.random().toString(36).substr(2, 9)}`;
     this.items.push(item);
