@@ -136,6 +136,7 @@ var flags = require('yargs')
     .option('log_level', {alias: 'l', default: log_level, describe: 'Amount of log, 4=everything, 3=normal, 2=only join/error/system, 1=only error/system'})
     .option('world_radius', {default: world_radius, describe: 'Size of world'})
     .option('item_spawn_rate', {default: item_spawn_rate, describe: 'Interval in seconds of spawning items'})
+    .option('no-serverline', {alias: 'o', describe: 'Dont use serverline'})
     .help()
     .argv;
 
@@ -144,6 +145,7 @@ world_radius = flags.world_radius;
 world_size = world_radius * 2;
 item_spawn_rate = flags.item_spawn_rate;
 
+log(2, 'Running without serverline!');
 log(4, 'log_level = ', log_level);
 log(4, 'world_radius = ', world_radius);
 log(4, 'item_spawn_rate = ', item_spawn_rate)
@@ -224,16 +226,17 @@ function heartbeat() {
   new_bullets = [];
   new_messages = [];
 }
-
-const myRL = require("serverline")
-myRL.setCompletion(['log_level', 'world', 'world.bullets', 'world.players', 'world.bullets', 'world.players', 'world.newItem()', 'msg()'])
-myRL.init({'forceTerminalContext':true})
-myRL.setPrompt('> ')
-myRL.on('line', function(line) {
-  try {
-    console.log(eval(line))
-  } catch (e) {
-    console.error(e)
-  }
-})
+if (!flags.o) {
+  const myRL = require("serverline")
+  myRL.setCompletion(['log_level', 'world', 'world.bullets', 'world.players', 'world.bullets', 'world.players', 'world.newItem()', 'msg()'])
+  myRL.init({'forceTerminalContext':true})
+  myRL.setPrompt('> ')
+  myRL.on('line', function(line) {
+    try {
+      console.log(eval(line))
+    } catch (e) {
+      console.error(e)
+    }
+  })  
+}
 setInterval(heartbeat, flags.i);
