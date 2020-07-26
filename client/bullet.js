@@ -1,3 +1,7 @@
+Bullet.MIN_DT = 10;
+Bullet.speed = 0.75;
+Bullet.max_age = 8000 / Bullet.speed;
+
 class Bullet extends Rect {
   constructor (cx, cy, vx, vy, power, author) {
     if (vx != 0) {
@@ -71,6 +75,3 @@ class Bullet extends Rect {
     // particle_fx(this.mx, this.my, 50, 1, random([this.color, "#fff"]));
   }
 }
-Bullet.MIN_DT = 10;
-Bullet.speed = 0.75;
-Bullet.max_age = 8000 / Bullet.speed;

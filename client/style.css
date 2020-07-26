@@ -3,9 +3,11 @@ html, body {
   padding: 0;
   background-color: #214;
 }
+
 canvas {
   display: block;
 }
+
 h1, h2 {
   color: #fff;
   font-family: Arial;
@@ -15,6 +17,7 @@ h1, h2 {
 .sad {
 	font-size: 5em;
 }
+
 noscript, #loading {
     height: 300px;
     width: 500px;
@@ -26,10 +29,12 @@ noscript, #loading {
     margin-top: -150px;
     margin-left: -250px;
 }
+
 a {
 	color:#fff;
 	text-decoration: underline dotted;
 }
+
 #username {
   height: 32px;
   width: 320px;
@@ -44,6 +49,7 @@ a {
   text-transform: uppercase;
   text-align: center;
 }
+
 #messages {
   position: fixed;
   left: 8px; bottom: 8px;

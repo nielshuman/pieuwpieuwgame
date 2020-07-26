@@ -131,12 +131,12 @@ class Player extends Rect {
 
 // command line arguments
 var flags = require('yargs')
-    .option('port', {alias: 'p', default: 3000, describe: 'port to bind on'})
+    .option('port', {alias: 'p', default: 3000, describe: 'Port to bind on'})
     .option('interval', {alias: 'i', default: 100, describe: 'Interval in miliseconds of sending data'})
     .option('log_level', {alias: 'l', default: log_level, describe: 'Amount of log, 4=everything, 3=normal, 2=only join/error/system, 1=only error/system'})
     .option('world_radius', {default: world_radius, describe: 'Size of world'})
     .option('item_spawn_rate', {default: item_spawn_rate, describe: 'Interval in seconds of spawning items'})
-    .option('no-serverline', {alias: 'o', describe: 'Dont use serverline'})
+    .option('no-serverline', {alias: 'o', describe: 'Don\'t use serverline (for nodejs <10)'})
     .help()
     .argv;
 
@@ -226,16 +226,17 @@ function heartbeat() {
   new_bullets = [];
   new_messages = [];
 }
+
 if (!flags.o) {
-  const myRL = require("serverline")
-  myRL.setCompletion(['log_level', 'world', 'world.bullets', 'world.players', 'world.bullets', 'world.players', 'world.newItem()', 'msg()'])
-  myRL.init({'forceTerminalContext':true})
-  myRL.setPrompt('> ')
-  myRL.on('line', function(line) {
+  const sl = require("serverline");
+  sl.setCompletion(['log_level', 'world', 'world.bullets', 'world.players', 'world.bullets', 'world.players', 'world.newItem()', 'msg()']);
+  sl.init({'forceTerminalContext':true});
+  sl.setPrompt('> ')
+  sl.on('line', function(line) {
     try {
-      console.log(eval(line))
+      console.log(eval(line));
     } catch (e) {
-      console.error(e)
+      console.error(e);
     }
   })  
 }

@@ -1,13 +1,16 @@
 p5.disableFriendlyErrors = true; // disables FES
-const names = ["pluisje", "vlekje", "kruimel", "poekie", "fluffie", "muffin",
-"diesel", "spike", "simba", "lucky", "spoekie", "tijger", "snuf",
-"woezel", "pip", "puck", "nugget"];
-const post_names = ["the destroyer", "the great", "the fool", "the conqueror",
-"of death", "doom", "the insane", "the indestructable", "the wicked",
-"the brutal", "frost", "the foul", "the pirate"];
+
 const pre_names = ["super", "mad ", "mega", "ultra", "hyper", "power", "giga",
 "insane ", "bad ", "zombie ", "robot ", "ninja ", "pirate ",
 "screaming ", "angry ", "happy ", "danger "];
+
+const names = ["pluisje", "vlekje", "kruimel", "poekie", "fluffie", "muffin",
+"diesel", "spike", "simba", "lucky", "spoekie", "tijger", "snuf",
+"woezel", "pip", "puck", "nugget"];
+
+const post_names = ["the destroyer", "the great", "the fool", "the conqueror",
+"of death", "doom", "the insane", "the indestructable", "the wicked",
+"the brutal", "frost", "the foul", "the pirate"];
 
 let username_box, messages_box;
 let walls = [], player, ready, world, socket;
@@ -52,7 +55,6 @@ function setup() {
   messages_box = select("#messages");
   masterVolume(0);
   window.focus();
-  // shootButton = new Button(width - 200, height - 200, 100, pointerImage);
 }
 
 function on_damage(amount, author) {
@@ -155,7 +157,6 @@ function draw() {
     socket.emit('player_update', player);
     next_update_time = time + 100; // upadet every 100ms
   }
-  // shootButton.show();
   if (player.itemExpirationTime != -1 && player.itemExpirationTime < time) player.clearEffects();
 
   if (frameCount % 20 == 0) fps = frameRate();
@@ -171,10 +172,6 @@ function draw() {
   text(`LOG: ${log_level}`, 10, height - 70);
 }
 
-function mouseClicked() {
-  // shootButton.click();
-}
-
 function keyPressed() {
   if (key == 'm') {
     if (getMasterVolume() == 0) {
@@ -185,7 +182,7 @@ function keyPressed() {
       log(1, 'Muted');
     }
   } else if (key == ' ' || key == 'j') {
-      player.shoot(key == 'j'? 0 : 2.5)
+      player.shoot(key == 'j'? 0 : 2.5) // "easter egg"
   } else if (key == 'x') {
       player.energy = max(0, player.energy - random(10,30));
   } else if (key == 'l') {

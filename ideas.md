@@ -1,19 +1,18 @@
 # IDEAS
 
--: todo
-X: Klaar
-.: Stom idee geen zin en dat soort dingen.
 
+## Items
 ### Tijdelijke items, timer aangegeven met een extra cirkel buiten de energy :
 - invulnerable
 - harder schieten
 X extra snelheid
 - invisible (moet wel erg zeldzaam zijn denk ik)
-. sneller healen
-X dat je breedte halveert of verdubbelt, en de hoogte ook, met 50% kans beide0
+X dat je breedte halveert of verdubbelt, en de hoogte ook, met 50% kans beide (stom, moet waarschinlijk weg)
 
 ### 1 actie items:
 X meer health
+
+## Ideeeen
 
 de muren health geven dat je ze kapot kan schieten
 

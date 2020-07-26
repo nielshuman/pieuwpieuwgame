@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 <html>
 	<head>
+    	<meta charset="utf-8">
+    	<link rel="stylesheet" type="text/css" href="style.css">
+        <title>PIEUWPIEUWGAME</title>
     	<script src="modules/p5.js"></script>
     	<script src="modules/p5.dom.min.js"></script>
     	<script src="modules/p5.sound.min.js"></script>
 		<script src="/socket.io/socket.io.js"></script>
-        <title>GAME</title>
-    	<link rel="stylesheet" type="text/css" href="style.css">
-    	<meta charset="utf-8">
 	</head>
     <body>
-        <!-- <script src="bar.js"></script> -->
         <script src="world.js"></script>
         <script src="rect.js"></script>
         <script src="player.js"></script>
@@ -18,7 +17,6 @@
         <script src="bullet.js"></script>
         <script src="particle.js"></script>
     	<script src="sketch.js"></script>
-        <script src="button.js"></script>
         <input type="text" id="username" maxlength="26"/>
         <div id="messages">WELCOME to GAME</div>
         <noscript>
@@ -26,7 +24,6 @@
             <h2> Dit spel werkt niet zonder javascript. <br>
             <a href="https://www.enable-javascript.com/nl/"> Zet het aan</a> om te spelen! </h2>
         </noscript>
-        <div id="game_canvas">
-        </div>
+        <div id="game_canvas"></div>
   	</body>
 </html>
