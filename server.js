@@ -1,3 +1,5 @@
+console.log('hier is iets!')
+
 let player_size = 32, item_size = 16;
 let world_radius = 1000, world_size = world_radius * 2;
 let item_spawn_rate = 10;
