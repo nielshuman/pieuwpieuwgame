@@ -18,7 +18,6 @@ let W, H, W2, H2, fps = 0, screen_rect;
 let time, show_debug_info = false;
 let shootSounds, font;
 let playerHitSounds, dedSound;
-let pointerImage;
 let log_level = 1;
 
 const log = (level, ...text) => { if (level <= log_level) console.log(`[${level}]`, ...text); }
@@ -34,7 +33,6 @@ function preload() {
   // hitSound = loadSound('assets/hit.wav');
   // wallHitSound = loadSound('assets/hitwall.wav');
   font = loadFont('assets/gamer.ttf', ()=>log(2, 'font loaded'));
-  pointerImage = loadImage('assets/pointer.png');
 }
 
 let canvas;
