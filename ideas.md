@@ -1,7 +1,5 @@
 # IDEAS
 
-
-## Items
 ### Tijdelijke items, timer aangegeven met een extra cirkel buiten de energy :
 - invulnerable
 - harder schieten
