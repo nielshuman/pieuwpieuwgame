@@ -6,7 +6,7 @@ let log_level = 3;
 const log = (level, ...text) => { if (level <= log_level) console.log(`[${level}]`, ...text); }
 const rand = (lo, hi) => lo + (hi - lo) * Math.random();
 const constrain = (n, lo, hi) => Math.max(Math.min(n, hi), lo);
-const randarray = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const choose = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const floor = Math.floor;
 const abs = Math.abs;
 
@@ -32,8 +32,8 @@ class World {
     for (let x = -world_radius; x < world_radius; x += g) {
       for (let y =  -world_radius; y < world_radius; y += g) {
         if (Math.random() < 0.5) continue;
-        let w = randarray([s, g + s]);
-        let h = randarray([s, g + s]);
+        let w = choose([s, g + s]);
+        let h = choose([s, g + s]);
         let wall = new Rect(x, y, w, h);
         wall.color = `hsl(${floor(225 + rand(-30, 30))}, 35%, ${rand(45, 65)}%)`;
         this.walls.push(wall);
