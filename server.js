@@ -133,6 +133,7 @@ class Player extends Rect {
 // command line arguments
 var flags = require('yargs')
     .option('port', {alias: 'p', default: 3000, describe: 'Port to bind on'})
+    .option('heroku-mode', {alias: 'h', describe: 'Read port from enviroment variable for heroku'})
     .option('interval', {alias: 'i', default: 100, describe: 'Interval in miliseconds of sending data'})
     .option('log_level', {alias: 'l', default: log_level, describe: 'Amount of log, 4=everything, 3=normal, 2=only join/error/system, 1=only error/system'})
     .option('world_radius', {default: world_radius, describe: 'Size of world'})
@@ -146,7 +147,7 @@ world_radius = flags.world_radius;
 world_size = world_radius * 2;
 item_spawn_rate = flags.item_spawn_rate;
 
-log(2, 'Running without serverline!');
+if (flags.o) log(2, 'Running without serverline!');
 log(4, 'log_level = ', log_level);
 log(4, 'world_radius = ', world_radius);
 log(4, 'item_spawn_rate = ', item_spawn_rate)
@@ -155,7 +156,7 @@ log(4, 'Starting server!');
 // Http server
 let express = require('express');
 let app = express();
-let server = app.listen(flags.p, () => log(1, 'Server listening at http://localhost:' + server.address().port));
+let server = app.listen(flags.h? process.env.PORT : flags.p, () => log(1, 'Server listening at http://localhost:' + server.address().port));
 app.use(express.static('client'));
 let io = require('socket.io')(server); // socket.io uses http server
 
