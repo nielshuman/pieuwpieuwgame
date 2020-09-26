@@ -19,6 +19,7 @@ let time, show_debug_info = false;
 let shootSounds, font;
 let playerHitSounds, dedSound;
 let log_level = 1;
+let accuracy_multiplier = 10;
 
 const log = (level, ...text) => { if (level <= log_level) console.log(`[${level}]`, ...text); }
 
@@ -112,9 +113,10 @@ function draw() {
   let prev_time = time;
   time = world.now();
   dt = time - prev_time;
+
   // controls and movement
-  let speed = 0.042 * dt;
-  for (let i = 0; i < 10; i++) { // super accurate physics time resolution
+  let speed = 0.42 / accuracy_multiplier * dt;
+  for (let i = 0; i < accuracy_multiplier; i++) { // super accurate physics time resolution
     if (keyIsDown(87 /*W*/) || keyIsDown(UP_ARROW))    player.move(0, -speed);
     if (keyIsDown(83 /*S*/) || keyIsDown(DOWN_ARROW))  player.move(0, speed);
     if (keyIsDown(65 /*A*/) || keyIsDown(LEFT_ARROW))  player.move(-speed, 0);
