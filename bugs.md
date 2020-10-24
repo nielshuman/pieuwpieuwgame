@@ -1,5 +1,3 @@
 # BUGZ
-
-Als je *met de pijltjes* naar linksboven beweegt kan je niet schieten.
-
-Als je framerate onder 25 is kan je door walls heen glitchen met speed item
+Muren gaan soms door de buitenmuren heen
+[![muur.png](https://i.postimg.cc/T3NZVbq2/muur.png)](https://postimg.cc/w1JfH7Gn)
