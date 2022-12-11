@@ -4,7 +4,7 @@
   "description": "Cool multiplayer game backend!",
   "main": "server.js",
   "dependencies": {
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "serverline": "^1.4.2",
     "socket.io": "^2.2.0",
     "yargs": "^14.0.0"
