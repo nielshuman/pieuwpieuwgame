@@ -21,6 +21,9 @@ let playerHitSounds, dedSound;
 let log_level = 1;
 let accuracy_multiplier = 10;
 
+let gui;
+let shootButton, joyStick;
+
 const log = (level, ...text) => { if (level <= log_level) console.log(`[${level}]`, ...text); }
 
 function preload() {
@@ -36,14 +39,14 @@ function preload() {
   font = loadFont('assets/gamer.ttf', ()=>log(2, 'font loaded'));
 }
 
-let canvas;
+let canvasje;
 let zoom = 1, vertical_view = 960;
 function setup() {
   // frameRate(30);
   log(2, '=== SETUP ===');
-  canvas = createCanvas(windowWidth, windowHeight);
+  canvasje = createCanvas(windowWidth, windowHeight);
   zoom = windowHeight / vertical_view;
-  canvas.parent('#game_canvas')
+  canvasje.parent('#game_canvas')
   socket = io();
   socket.on('server_update', on_server_update);
   socket.on('server_welcome', on_server_welcome);
@@ -54,6 +57,10 @@ function setup() {
   messages_box = select("#messages");
   masterVolume(0);
   window.focus();
+  gui = createGui('Controls');
+  shootButton = createButton('PIEUW ', 50, 50);
+  shootButton.onPress = () => player.shoot(2.5);
+  joyStick = createJoystick("Joystick", 10, 210, 175, 175, -1, 1, 1, -1);
 }
 
 function on_damage(amount, author) {
@@ -121,6 +128,10 @@ function draw() {
     if (keyIsDown(83 /*S*/) || keyIsDown(DOWN_ARROW))  player.move(0, speed);
     if (keyIsDown(65 /*A*/) || keyIsDown(LEFT_ARROW))  player.move(-speed, 0);
     if (keyIsDown(68 /*D*/) || keyIsDown(RIGHT_ARROW)) player.move(speed, 0);
+    
+    player.move(joyStick.valX * speed, 0);
+    player.move(0, joyStick.valY * speed);
+
   }
 
   // rendering world
@@ -165,6 +176,8 @@ function draw() {
   if (player.energy > 0) player.energy = min(100, player.energy + 3 * dt / 1000);
   player.username = username_box.value().substring(0, 26).toUpperCase();
   
+  drawGui();
+  
   if (!log_level) return;
   fill(255);
   stroke(0);
@@ -172,6 +185,8 @@ function draw() {
   text(`NOW: ${world.now()}`, 10, height - 30);
   text(`IET: ${player.itemExpirationTime}`, 10, height - 50)
   text(`LOG: ${log_level}`, 10, height - 70);
+
+
 }
 
 function keyPressed() {
@@ -192,6 +207,7 @@ function keyPressed() {
     log_level %= 3;
   }
 }
+
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
