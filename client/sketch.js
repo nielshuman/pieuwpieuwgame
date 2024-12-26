@@ -27,6 +27,7 @@ let shootButton, joyStick;
 
 function touchStarted() {
   touch_device = true;
+  canvasje.elt.focus();
   fullscreen(true);
 }
 

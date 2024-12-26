@@ -49,6 +49,7 @@ a {
   border-radius: 8px;
   text-transform: uppercase;
   text-align: center;
+  touch-action: auto;
 }
 
 #messages {
