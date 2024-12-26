@@ -18,7 +18,7 @@ let W, H, W2, H2, fps = 0, screen_rect;
 let time, show_debug_info = false;
 let shootSounds, font;
 let playerHitSounds, dedSound;
-let log_level = 1;
+let log_level = 0;
 let accuracy_multiplier = 10;
 
 let touch_device = false;
