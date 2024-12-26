@@ -21,8 +21,13 @@ let playerHitSounds, dedSound;
 let log_level = 1;
 let accuracy_multiplier = 10;
 
+let touch_device = false;
 let gui;
 let shootButton, joyStick;
+
+function touchStarted() {
+  touch_device = true;
+}
 
 const log = (level, ...text) => { if (level <= log_level) console.log(`[${level}]`, ...text); }
 
@@ -58,9 +63,11 @@ function setup() {
   masterVolume(0);
   window.focus();
   gui = createGui('Controls');
-  shootButton = createButton('PIEUW ', 50, 50);
+  shootButton = createButton('PIEUW!', 0, 0, 100, 50);
+  soundToggle = createToggle('SOUND', 0, 0, 100, 25, false);
+  soundToggle.onPress = () => toggleMute();
   shootButton.onPress = () => player.shoot(2.5);
-  joyStick = createJoystick("Joystick", 10, 210, 175, 175, -1, 1, 1, -1);
+  joyStick = createJoystick("Joystick", 0, 0, 175, 175, -1, 1, 1, -1);
 }
 
 function on_damage(amount, author) {
@@ -124,14 +131,14 @@ function draw() {
   // controls and movement
   let speed = 0.42 / accuracy_multiplier * dt;
   for (let i = 0; i < accuracy_multiplier; i++) { // super accurate physics time resolution
-    if (keyIsDown(87 /*W*/) || keyIsDown(UP_ARROW))    player.move(0, -speed);
-    if (keyIsDown(83 /*S*/) || keyIsDown(DOWN_ARROW))  player.move(0, speed);
-    if (keyIsDown(65 /*A*/) || keyIsDown(LEFT_ARROW))  player.move(-speed, 0);
-    if (keyIsDown(68 /*D*/) || keyIsDown(RIGHT_ARROW)) player.move(speed, 0);
-    
-    player.move(joyStick.valX * speed, 0);
-    player.move(0, joyStick.valY * speed);
-
+    if (!touch_device) {
+      if (keyIsDown(87 /*W*/) || keyIsDown(UP_ARROW))    player.move(0, -speed);
+      if (keyIsDown(83 /*S*/) || keyIsDown(DOWN_ARROW))  player.move(0, speed);
+      if (keyIsDown(65 /*A*/) || keyIsDown(LEFT_ARROW))  player.move(-speed, 0);
+      if (keyIsDown(68 /*D*/) || keyIsDown(RIGHT_ARROW)) player.move(speed, 0);
+    }
+    if (touch_device && (joyStick.valX || joyStick.valY)) player.move2(joyStick.valX * speed, joyStick.valY * speed);
+    // player.move(0,0) // super raar
   }
 
   // rendering world
@@ -176,7 +183,14 @@ function draw() {
   if (player.energy > 0) player.energy = min(100, player.energy + 3 * dt / 1000);
   player.username = username_box.value().substring(0, 26).toUpperCase();
   
-  drawGui();
+
+  joyStick.x = width - joyStick.w - 10;
+  joyStick.y = height - joyStick.h - 60;
+  shootButton.x = soundToggle.x
+  shootButton.y = soundToggle.y - shootButton.h - 10
+  soundToggle.x = 10;
+  soundToggle.y = height - soundToggle.h - 60;
+  if (touch_device) drawGui();
   
   if (!log_level) return;
   fill(255);
@@ -189,15 +203,24 @@ function draw() {
 
 }
 
+function toggleMute() {
+  if (getMasterVolume() == 0) {
+    masterVolume(1);
+    log(1, 'Unmuted');
+    soundToggle.val = true;
+    return 1;
+  } else {
+    masterVolume(0);
+    log(1, 'Muted');
+    soundToggle.val = false;
+    return 0;
+  }
+}
+
 function keyPressed() {
+  touch_device = false;
   if (key == 'm') {
-    if (getMasterVolume() == 0) {
-      masterVolume(1);
-      log(1, 'Unmuted');
-    } else {
-      masterVolume(0);
-      log(1, 'Muted');
-    }
+    toggleMute();
   } else if (key == ' ' || key == 'j') {
       player.shoot(key == 'j'? 0 : 2.5) // "easter egg"
   } else if (key == 'x') {

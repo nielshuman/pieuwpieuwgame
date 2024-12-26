@@ -26,6 +26,13 @@ class Player extends SolidRect {
     this.dy = Math.sign(dy);
   }
 
+  move2(dx, dy) {
+    super.move(dx*this.speed, 0);
+    super.move(0, dy*this.speed);
+    this.dx = dx > dy? Math.sign(dx) : 0;
+    this.dy = dy > dx? Math.sign(dy) : 0;
+  }
+
   shoot(bullet_cost=2.5) {
     let dx = this.dx, dy = this.dy;
     let x = this.mx + dx * this.w / 2;
