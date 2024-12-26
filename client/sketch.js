@@ -27,6 +27,7 @@ let shootButton, joyStick;
 
 function touchStarted() {
   touch_device = true;
+  fullscreen(true);
 }
 
 const log = (level, ...text) => { if (level <= log_level) console.log(`[${level}]`, ...text); }
