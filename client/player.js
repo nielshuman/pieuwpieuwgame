@@ -29,9 +29,8 @@ class Player extends SolidRect {
   move2(dx, dy) {
     super.move(dx*this.speed, 0);
     super.move(0, dy*this.speed);
-    this.dx = Math.abs(dx) > Math.abs(dy)? Math.sign(dx) : 0;
+    this.dx = Math.abs(dx) >= Math.abs(dy)? Math.sign(dx) : 0;
     this.dy = Math.abs(dy) > Math.abs(dx)? Math.sign(dy) : 0;
-    if (this.dx && this.dy) this.dy = 0; // prevent middle thing
   }
 
   shoot(bullet_cost=2.5) {
