@@ -68,7 +68,7 @@ function setup() {
   soundToggle = createToggle('SOUND', 0, 0, 100, 25, false);
   soundToggle.onPress = () => toggleMute();
   shootButton.onPress = () => player.shoot(2.5);
-  joyStick = createJoystick("Joystick", 0, 0, 175, 175, -1, 1, 1, -1);
+  joyStick = createJoystick("Joystick", 0, 0, 125, 125, -1, 1, 1, -1);
 }
 
 function on_damage(amount, author) {
