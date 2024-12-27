@@ -157,7 +157,11 @@ log(4, 'Starting server!');
 let express = require('express');
 let app = express();
 let server = app.listen(flags.h? process.env.PORT : flags.p, () => log(1, 'Server listening at http://localhost:' + server.address().port));
+app.get('/marcade', (req, res) =>{
+  res.redirect('/marcade.html');
+})
 app.use(express.static('client'));
+
 let io = require('socket.io')(server); // socket.io uses http server
 
 // ========= BEGIN =========================================================

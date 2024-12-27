@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="marcade.css">
+    </head>
+    <body>
+        <div class="container">
+            <div class="container">
+                <h2 id="welcome">WELCOME TO</h1>
+                <div id="gametitle">PIEUWPIEUWGAME</div>
+                <h2 class="title"> <span id="op">ON</span> <div class="title animate-charcter">MARCADE</div> </h2>
+            </div>
+                
+            <div class="container">
+                <img src="assets/QR code.svg" alt="QR code" id="qr" width="150">
+                <span id="link">pieuw.justniels.nl</span> 
+                <p class="text-center">Speel mee op je telefoon of laptop! <br> Zonder medespelers is er namelijk niets te doen :( </p>
+            </div>
+        </div>
+
+        <div class="onder">
+            <div id="press">PRESS<img src="assets/button_yellow.png" height="40px">TO CONTINUE</div>
+        </div>
+
+        <script>
+            document.addEventListener('keydown', function(event) {
+                if (event.code == 'Space') {
+                    window.location.href = "marcade_controls.html";
+                }
+            });
+        </script>
+    </body>
+</html>
