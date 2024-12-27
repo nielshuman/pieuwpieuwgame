@@ -48,11 +48,12 @@ function preload() {
 
 let canvasje;
 let zoom = 1, vertical_view = 960;
+let MIN_ZOOM = 0.75;
 function setup() {
   // frameRate(30);
   log(2, '=== SETUP ===');
   canvasje = createCanvas(windowWidth, windowHeight);
-  zoom = windowHeight / vertical_view;
+  zoom = Math.max(windowHeight / vertical_view, MIN_ZOOM);
   canvasje.parent('#game_canvas')
   socket = io();
   socket.on('server_update', on_server_update);
@@ -236,5 +237,5 @@ function keyPressed() {
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
-  zoom = windowHeight / vertical_view;
+  zoom = Math.max(windowHeight / vertical_view, MIN_ZOOM);
 }
